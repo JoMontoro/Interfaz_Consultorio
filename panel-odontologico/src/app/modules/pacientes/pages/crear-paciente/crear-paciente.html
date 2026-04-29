@@ -1,0 +1,11 @@
+<div class="form-container">
+  <h2>Registrar Paciente</h2>
+
+  <input [(ngModel)]="paciente.nombre" placeholder="Nombre">
+  <input [(ngModel)]="paciente.apellido" placeholder="Apellido">
+  <input [(ngModel)]="paciente.edad" type="number" placeholder="Edad">
+  <input [(ngModel)]="paciente.dni" placeholder="DNI">
+  <input [(ngModel)]="paciente.telefono" placeholder="Teléfono">
+
+  <button (click)="guardar()">Guardar</button>
+</div>

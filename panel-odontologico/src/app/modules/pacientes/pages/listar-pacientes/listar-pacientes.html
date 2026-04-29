@@ -1,0 +1,29 @@
+<div class="container">
+  <h2>Lista de Pacientes</h2>
+
+  <button class="btn-agregar" routerLink="/pacientes/crear">
+    + Nuevo Paciente
+  </button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Edad</th>
+        <th>DNI</th>
+        <th>Teléfono</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let p of lista">
+        <td>{{p.nombre}}</td>
+        <td>{{p.apellido}}</td>
+        <td>{{p.edad}}</td>
+        <td>{{p.dni}}</td>
+        <td>{{p.telefono}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
