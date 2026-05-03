@@ -38,4 +38,7 @@ constructor(private service: PacienteService, private router: Router) {}
     }
     });
   }
+  cancelar(){
+   this.router.navigate(['/pacientes']);
+  }
 }

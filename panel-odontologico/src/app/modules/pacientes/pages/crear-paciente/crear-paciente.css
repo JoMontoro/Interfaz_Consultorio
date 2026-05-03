@@ -29,3 +29,10 @@ button {
 button:hover {
   background-color: #219150;
 }
+
+.btn-cancelar {
+  background-color: #e74c3c;
+}
+.btn-cancelar:hover {
+  background-color: #c0392b;
+}

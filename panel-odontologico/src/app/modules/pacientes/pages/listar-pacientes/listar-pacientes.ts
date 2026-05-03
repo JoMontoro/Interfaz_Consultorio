@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { PacienteService } from '../../../../module/pacientes/services/paciente';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-listar-pacientes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './listar-pacientes.html',
   styleUrls: ['./listar-pacientes.css'],
 })

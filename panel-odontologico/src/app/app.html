@@ -1,1 +1,17 @@
-<router-outlet></router-outlet>
+<div class="app-shell">
+  <aside class="sidebar" *ngIf="showSidebar">
+    <div class="sidebar-brand">
+      <h1>Consultorio</h1>
+      <p>Panel Odontológico</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/pacientes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Lista de Pacientes</a>
+      <a routerLink="/pacientes/crear" routerLinkActive="active">Nuevo Paciente</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
