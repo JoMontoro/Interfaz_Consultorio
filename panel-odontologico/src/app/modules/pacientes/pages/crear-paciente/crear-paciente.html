@@ -4,8 +4,11 @@
   <input [(ngModel)]="paciente.nombre" placeholder="Nombre">
   <input [(ngModel)]="paciente.apellido" placeholder="Apellido">
   <input [(ngModel)]="paciente.edad" type="number" placeholder="Edad">
+  <input [(ngModel)]="paciente.apoderado" placeholder="Apoderado">
+  <input [(ngModel)]="paciente.direccion" placeholder="Dirección">
   <input [(ngModel)]="paciente.dni" placeholder="DNI">
   <input [(ngModel)]="paciente.telefono" placeholder="Teléfono">
+  <input [(ngModel)]="paciente.email" placeholder="Email">
 
   <button (click)="guardar()">Guardar</button>
   <button (click)="cancelar()" class="btn-cancelar">Cancelar</button>

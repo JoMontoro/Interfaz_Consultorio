@@ -15,9 +15,12 @@ paciente = {
   nombre: '',
   apellido: '',
   edad: null,
+  apoderado: '',
+  direccion:'',
+  dni: '',
   telefono: '',
-  email: '',
-  dni: ''
+  email: ''
+  
 }
 constructor(private service: PacienteService, private router: Router) {}
 
