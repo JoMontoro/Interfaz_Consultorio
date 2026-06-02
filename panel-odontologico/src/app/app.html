@@ -6,9 +6,13 @@
     </div>
 
     <nav class="sidebar-nav">
-      <a routerLink="/pacientes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Lista de Pacientes</a>
-      <a routerLink="/pacientes/crear" routerLinkActive="active">Nuevo Paciente</a>
+      <a routerLink="/panel-principal" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Panel Principal</a>
     </nav>
+        <nav class="sidebar-nav">
+      <a routerLink="/pacientes" routerLinkActive="" [routerLinkActiveOptions]="{ exact: true }">Lista de Pacientes</a>
+    </nav>
+        
+    <button class="sidebar-logout" (click)="logout()">Cerrar sesión</button>
   </aside>
 
   <main class="content">

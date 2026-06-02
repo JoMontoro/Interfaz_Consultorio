@@ -17,4 +17,9 @@ export class AuthService {
 
     return this.http.get(`${this.url}/pacientes`, { headers });
   }
+
+  logout() {
+    // Clear any stored authentication state here when implemented.
+    console.log('Usuario desconectado');
+  }
 }

@@ -1,0 +1,270 @@
+<div *ngIf="loading" class="loading-container">
+
+  Cargando dashboard...
+
+</div>
+
+<div class="panel-container">
+
+  <!-- HEADER -->
+  <div class="top-header">
+
+    <div>
+      <h1>
+        Hola de nuevo,
+        {{ dashboard?.doctorNombre || 'Doctor' }}
+      </h1>
+
+      <p>
+        Resumen de la clínica para hoy.
+      </p>
+    </div>
+
+    <button class="btn-hoy" routerLink="/citas/crear">
+      + Agendar Cita
+    </button>
+
+  </div>
+
+  <!-- CARDS -->
+  <div class="cards-grid">
+
+    <!-- CITAS -->
+    <div class="stat-card">
+
+      <div class="card-icon">
+        📅
+      </div>
+
+      <span class="percentage success">
+        +12%
+      </span>
+
+      <h3>
+        CITAS COMPLETADAS
+      </h3>
+
+      <h2>
+        {{ dashboard?.citasCompletadas || 0 }}
+      </h2>
+
+    </div>
+
+    <!-- PACIENTES -->
+    <div class="stat-card">
+
+      <div class="card-icon">
+        👥
+      </div>
+
+      <span class="percentage success">
+        +5%
+      </span>
+
+      <h3>
+        PACIENTES NUEVOS
+      </h3>
+
+      <h2>
+        {{ dashboard?.pacientesNuevos || 0 }}
+      </h2>
+
+    </div>
+
+    <!-- FACTURACION -->
+    <div class="stat-card">
+
+      <div class="card-icon">
+        💳
+      </div>
+
+      <span class="percentage danger">
+        -2%
+      </span>
+
+      <h3>
+        FACTURACIÓN MENSUAL
+      </h3>
+
+      <h2>
+        S/ {{ dashboard?.facturacionMensual || 0 }}
+      </h2>
+
+    </div>
+
+    <!-- ALERTAS -->
+    <div class="alert-card">
+
+      <h3>
+        ⚠ ALERTAS DE INVENTARIO
+      </h3>
+
+      <div class="alert-item">
+
+        <span>
+          Resina Composite A2
+        </span>
+
+        <span class="badge-red">
+          2 u. rest.
+        </span>
+
+      </div>
+
+      <div class="alert-item">
+
+        <span>
+          Agujas Carpule 27G
+        </span>
+
+        <span class="badge-red">
+          Bajo
+        </span>
+
+      </div>
+
+      <button class="btn-stock" RouterLink="/inventario">
+        Gestionar Stock
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="content-grid">
+
+    <!-- CITAS -->
+    <div class="table-card">
+
+      <div class="table-header">
+
+        <h3>
+          🕒 CITAS DE HOY
+        </h3>
+
+      </div>
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Hora</th>
+            <th>Paciente</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let cita of dashboard?.citasHoy">
+
+            <td>
+              {{ cita.hora }}
+            </td>
+
+            <td>
+              <a [routerLink]="['/pacientes/detalle', cita.id_paciente]">
+                {{ cita.paciente }}
+              </a>
+            </td>
+
+            <td>
+              {{ cita.tratamiento }}
+            </td>
+
+            <td>
+
+              <span class="status" [ngClass]="{
+                  'confirmado':
+                    cita.estado === 'CONFIRMADO',
+              
+                  'espera':
+                    cita.estado === 'EN ESPERA',
+              
+                  'cancelado':
+                    cita.estado === 'CANCELADO'
+                }">
+
+                {{ cita.estado }}
+
+              </span>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    <!-- PACIENTES -->
+    <div class="right-panel">
+
+      <div class="patients-card">
+
+        <h3>
+          👨‍⚕️ PACIENTES RECIENTES
+        </h3>
+
+<div class="patient-item" *ngFor="
+    let paciente
+    of dashboard?.pacientesRecientes
+  " [routerLink]="[
+    '/pacientes/detalle',
+    paciente.id
+  ]">
+
+  <div class="avatar">
+
+            {{
+            paciente.nombre?.charAt(0)
+            }}
+
+          </div>
+
+          <div>
+
+            <strong>
+              {{ paciente.nombre }}
+            </strong>
+
+            <p>
+              Última visita:
+              {{ paciente.ultimaVisita }}
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ODONTOGRAMA -->
+      <div class="odontograma-card">
+
+        <h3>
+          Módulo Odontograma 2.0
+        </h3>
+
+        <p>
+          Nueva versión interactiva
+          con historial clínico sincronizado.
+        </p>
+
+        <button RouterLink="/odontograma">
+          Explorar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

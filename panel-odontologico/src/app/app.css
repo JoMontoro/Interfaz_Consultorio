@@ -47,6 +47,23 @@
   background: #4f46e5;
 }
 
+.sidebar-logout {
+  width: 100%;
+  margin-top: 24px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 10px;
+  background: #dc2626;
+  color: #f9fafb;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sidebar-logout:hover {
+  background: #b91c1c;
+}
+
 .content {
   flex: 1;
   padding: 24px;

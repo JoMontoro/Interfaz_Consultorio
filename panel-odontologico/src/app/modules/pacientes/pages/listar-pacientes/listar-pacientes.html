@@ -16,11 +16,12 @@
         <th>DNI</th>
         <th>Teléfono</th>
         <th>Email</th>
+        <th>Acciones</th>
       </tr>
     </thead>
 
     <tbody>
-      <tr *ngFor="let p of lista">
+      <tr *ngFor="let p of Lista" class="patient-row">
         <td>{{p.nombre}}</td>
         <td>{{p.apellido}}</td>
         <td>{{p.edad}}</td>
@@ -29,7 +30,47 @@
         <td>{{p.dni}}</td>
         <td>{{p.telefono}}</td>
         <td>{{p.email}}</td>
+        <td class="td-actions">
+          <button class="btn-editar" [routerLink]="['/pacientes/editar', p.id_paciente]">
+            ✏️ Editar
+          </button>
+          <button class="btn-ver" [routerLink]="[
+              '/pacientes/detalle',
+              p.id_paciente,
+            ]">
+            Ver Detalle
+          </button>
+          <button class="btn-eliminar" (click)="eliminar(p.id_paciente)">
+            🗑️ Eliminar
+          </button>
+        </td>
       </tr>
-    </tbody>
+    </tbody>  
   </table>
+  <div class="pagination">
+
+  <button
+    (click)="paginaAnterior()"
+    [disabled]="pagina === 0"
+  >
+    Anterior
+  </button>
+
+  <span>
+
+    Página
+    {{ pagina + 1 }}
+    de
+    {{ totalPages }}
+
+  </span>
+
+  <button
+    (click)="siguientePagina()"
+    [disabled]="pagina >= totalPages - 1"
+  >
+    Siguiente
+  </button>
+
+</div>
 </div>

@@ -12,17 +12,92 @@ import { RouterModule } from '@angular/router';
 })
 export class ListarPacientes implements OnInit {
 
-  lista: any[] = [];
-
+  Lista: any[] = [];
+  pagina=0;
+  size =10;
+  totalPages = 0;
   constructor(private service: PacienteService) {}
 
-  ngOnInit() {
-    this.service.listar().subscribe({
-      next: (data) => {
-        console.log("DATA:", data);
-        this.lista = data;
-      },
-      error: (err) => console.error(err)
-    });
+  ngOnInit(): void {
+    this.cargarPacientes();
+  }
+
+  cargarPacientes() {
+
+    this.service
+      .listarPaginado(
+        this.pagina,
+        this.size
+      )
+      .subscribe({
+
+        next: (data: any) => {
+
+          console.log(data);
+
+          this.Lista =
+            data.content;
+
+          this.totalPages =
+            data.totalPages;
+
+        },
+
+        error: (err: any) => {
+
+          console.error(err);
+
+        }
+
+      });
+
+  }
+
+  siguientePagina() {
+
+    if (
+      this.pagina <
+      this.totalPages - 1
+    ) {
+
+      this.pagina++;
+
+      this.cargarPacientes();
+
+    }
+
+  }
+
+  paginaAnterior() {
+
+    if (
+      this.pagina > 0
+    ) {
+
+      this.pagina--;
+
+      this.cargarPacientes();
+
+    }
+
+  }
+
+  eliminar(id: number) {
+
+    if(confirm('¿Eliminar paciente?')) {
+
+      this.service.eliminar(id).subscribe({
+
+        next: () => {
+          alert('Paciente eliminado');
+          this.cargarPacientes();
+        },
+
+        error: (err: any) => {
+          console.error(err);
+        }
+
+      });
+    }
   }
 }

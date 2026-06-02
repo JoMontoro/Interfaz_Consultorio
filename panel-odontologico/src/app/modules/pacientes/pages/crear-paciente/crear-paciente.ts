@@ -40,8 +40,20 @@ constructor(private service: PacienteService, private router: Router) {}
       alert('Error al guardar');
     }
     });
+  if (!/^9\d{8}$/.test(this.paciente.telefono)) {
+
+  alert('El teléfono debe iniciar con 9 y tener 9 dígitos');
+  return;
+
+}
   }
   cancelar(){
    this.router.navigate(['/pacientes']);
   }
+  soloNumeros(event: any) {
+
+  event.target.value =
+    event.target.value.replace(/[^0-9]/g, '');
+
+}
 }

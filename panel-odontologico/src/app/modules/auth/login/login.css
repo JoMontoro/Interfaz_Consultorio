@@ -1,0 +1,125 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle at top left, #d8eef7 0%, #ffffff 40%),
+              linear-gradient(180deg, #f3f9ff 0%, #eaf2f9 100%);
+  color: #1f3a58;
+}
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.login-card {
+  width: min(420px, 100%);
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(31, 58, 88, 0.12);
+  padding: 34px 32px;
+  border: 1px solid rgba(31, 58, 88, 0.08);
+}
+
+.login-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.login-logo {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2b7ecf 0%, #78c4ff 100%);
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(43, 126, 207, 0.18);
+}
+
+.login-header h1 {
+  margin: 0;
+  font-size: 1.65rem;
+  letter-spacing: -0.03em;
+}
+
+.login-header p {
+  margin: 4px 0 0;
+  color: #5a6f86;
+  font-size: 0.95rem;
+}
+
+.login-form label {
+  display: block;
+  margin: 18px 0 8px;
+  font-weight: 600;
+  color: #2d4973;
+}
+
+.login-form input {
+  width: 100%;
+  border: 1px solid #d8e4f2;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 1rem;
+  color: #1f3a58;
+  background: #f9fbff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #4a8cd6;
+  box-shadow: 0 0 0 4px rgba(74, 140, 214, 0.14);
+}
+
+.login-form button {
+  width: 100%;
+  margin-top: 26px;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #3178cc 0%, #4aa6ff 100%);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-form button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(49, 120, 204, 0.18);
+}
+
+.login-footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #eef3f8;
+  color: #5a6f86;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 20px;
+  }
+
+  .login-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .login-logo {
+    width: 54px;
+    height: 54px;
+    font-size: 28px;
+  }
+}

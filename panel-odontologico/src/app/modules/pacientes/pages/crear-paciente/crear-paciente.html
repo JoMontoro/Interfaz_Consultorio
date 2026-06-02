@@ -6,8 +6,23 @@
   <input [(ngModel)]="paciente.edad" type="number" placeholder="Edad">
   <input [(ngModel)]="paciente.apoderado" placeholder="Apoderado">
   <input [(ngModel)]="paciente.direccion" placeholder="Dirección">
-  <input [(ngModel)]="paciente.dni" placeholder="DNI">
-  <input [(ngModel)]="paciente.telefono" placeholder="Teléfono">
+  <input   
+  id="dni"
+  type="text"
+  [(ngModel)]="paciente.dni"
+  name="dni"
+  maxlength="8"
+  (input)="soloNumeros($event)"
+  required
+ placeholder="DNI">
+  <input   
+  id="telefono"
+  type="text"
+  [(ngModel)]="paciente.telefono"
+  name="telefono"
+  maxlength="9"
+  pattern="9[0-9]{8}"
+  required placeholder="Teléfono">
   <input [(ngModel)]="paciente.email" placeholder="Email">
 
   <button (click)="guardar()">Guardar</button>
