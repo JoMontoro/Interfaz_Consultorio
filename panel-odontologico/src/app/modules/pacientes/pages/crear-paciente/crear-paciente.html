@@ -1,30 +1,57 @@
-<div class="form-container">
-  <h2>Registrar Paciente</h2>
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1>Registrar Paciente</h1>
+      <p class="page-subtitle">Complete los datos del nuevo paciente</p>
+    </div>
+    <a class="btn-outline" routerLink="/pacientes">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </a>
+  </div>
 
-  <input [(ngModel)]="paciente.nombre" placeholder="Nombre">
-  <input [(ngModel)]="paciente.apellido" placeholder="Apellido">
-  <input [(ngModel)]="paciente.edad" type="number" placeholder="Edad">
-  <input [(ngModel)]="paciente.apoderado" placeholder="Apoderado">
-  <input [(ngModel)]="paciente.direccion" placeholder="Dirección">
-  <input   
-  id="dni"
-  type="text"
-  [(ngModel)]="paciente.dni"
-  name="dni"
-  maxlength="8"
-  (input)="soloNumeros($event)"
-  required
- placeholder="DNI">
-  <input   
-  id="telefono"
-  type="text"
-  [(ngModel)]="paciente.telefono"
-  name="telefono"
-  maxlength="9"
-  pattern="9[0-9]{8}"
-  required placeholder="Teléfono">
-  <input [(ngModel)]="paciente.email" placeholder="Email">
+  <div class="card form-card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" [(ngModel)]="paciente.nombre" placeholder="Ingrese el nombre" />
+      </div>
+      <div class="form-group">
+        <label for="apellido">Apellido</label>
+        <input id="apellido" [(ngModel)]="paciente.apellido" placeholder="Ingrese el apellido" />
+      </div>
+      <div class="form-group">
+        <label for="edad">Edad</label>
+        <input id="edad" [(ngModel)]="paciente.edad" type="number" placeholder="Edad" />
+      </div>
+      <div class="form-group">
+        <label for="dni">DNI</label>
+        <input id="dni" [(ngModel)]="paciente.dni" name="dni" maxlength="8" (input)="soloNumeros($event)" placeholder="12345678" />
+      </div>
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input id="telefono" [(ngModel)]="paciente.telefono" name="telefono" maxlength="9" placeholder="999 999 999" />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" [(ngModel)]="paciente.email" type="email" placeholder="correo@ejemplo.com" />
+      </div>
+      <div class="form-group">
+        <label for="direccion">Dirección</label>
+        <input id="direccion" [(ngModel)]="paciente.direccion" placeholder="Dirección completa" />
+      </div>
+      <div class="form-group">
+        <label for="apoderado">Apoderado (opcional)</label>
+        <input id="apoderado" [(ngModel)]="paciente.apoderado" placeholder="Nombre del apoderado" />
+      </div>
+    </div>
 
-  <button (click)="guardar()">Guardar</button>
-  <button (click)="cancelar()" class="btn-cancelar">Cancelar</button>
+    <div class="form-actions">
+      <button class="btn-primary" (click)="guardar()">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Guardar
+      </button>
+      <button class="btn-secondary" (click)="cancelar()">Cancelar</button>
+    </div>
+  </div>
 </div>

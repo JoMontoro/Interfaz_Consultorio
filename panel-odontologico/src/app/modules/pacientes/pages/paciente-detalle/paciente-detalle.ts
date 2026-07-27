@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { RouterModule } from '@angular/router';
-import { PacienteService }
-from '../../../../module/pacientes/services/paciente';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { PacienteService } from '../../../../module/pacientes/services/paciente';
 
 @Component({
   selector: 'app-detalle-paciente',
@@ -12,21 +10,17 @@ from '../../../../module/pacientes/services/paciente';
   templateUrl: './paciente-detalle.html',
   styleUrls: ['./paciente-detalle.css']
 })
-export class DetallePaciente
-implements OnInit {
+export class DetallePaciente implements OnInit {
 
   tab = 'datos';
+  loading = true;
+  error = false;
 
   paciente: any = {};
-
   historial: any = {};
-
   diagnostico: any = {};
-
   presupuesto: any = {};
-
   tratamientos: any[] = [];
-
   evoluciones: any[] = [];
 
   constructor(
@@ -35,56 +29,33 @@ implements OnInit {
   ) {}
 
   ngOnInit(): void {
-
-    const id = Number(
-      this.route.snapshot.paramMap.get('id')
-    );
-     console.log('ID:', id);
-
-  if (id) {
-
-    this.cargarPaciente(id);
-
-  }
-
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    if (id) {
+      this.cargarPaciente(id);
+    } else {
+      this.error = true;
+      this.loading = false;
+    }
   }
 
   cargarPaciente(id: number) {
-
-    this.pacienteService
-      .obtenerDetalle(id)
-      .subscribe({
-
-        next: (data: any) => {
-
-          console.log(data);
-
-          this.paciente =
-            data.paciente || {};
-
-          this.historial =
-            data.historial || {};
-
-          this.diagnostico =
-            data.diagnostico || {};
-
-          this.presupuesto =
-            data.presupuesto || {};
-
-          this.tratamientos =
-            data.tratamientos || [];
-
-          this.evoluciones =
-            data.evoluciones || [];
-
-        },
-
-        error: (err: any) => {
-          console.error(err);
-        }
-
-      });
-
+    this.loading = true;
+    this.error = false;
+    this.pacienteService.obtenerDetalle(id).subscribe({
+      next: (data: any) => {
+        this.paciente = data.paciente || {};
+        this.historial = data.historial || {};
+        this.diagnostico = data.diagnostico || {};
+        this.presupuesto = data.presupuesto || {};
+        this.tratamientos = data.tratamientos || [];
+        this.evoluciones = data.evoluciones || [];
+        this.loading = false;
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.error = true;
+        this.loading = false;
+      }
+    });
   }
-
 }

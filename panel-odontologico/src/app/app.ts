@@ -11,17 +11,28 @@ import { AuthService } from './core/services/auth';
   styleUrl: './app.css'
 })
 export class App {
-  protected title = 'panel-odontologico';
   protected showSidebar = true;
+  protected sidebarCollapsed = false;
+  protected dashboardDoctor = 'odontólogo';
 
   constructor(private router: Router, private auth: AuthService) {
-    this.showSidebar = !this.router.url.startsWith('/login') && !this.router.url.startsWith('/pacientes/crear');
+    this.actualizarLayout();
 
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(() => {
-        this.showSidebar = !this.router.url.startsWith('/login') && !this.router.url.startsWith('/pacientes/crear');
+        this.actualizarLayout();
       });
+  }
+
+  private actualizarLayout() {
+    const esLogin = this.router.url.startsWith('/login');
+    const esCrearPaciente = this.router.url.startsWith('/pacientes/crear');
+    this.showSidebar = !esLogin && !esCrearPaciente;
+  }
+
+  toggleSidebar() {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
   }
 
   logout() {
