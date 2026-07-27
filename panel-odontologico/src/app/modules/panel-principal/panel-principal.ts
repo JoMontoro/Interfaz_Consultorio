@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { PacienteService } from '../../module/pacientes/services/paciente';
 
 @Component({
   selector: 'app-panel-principal',
@@ -12,36 +13,38 @@ import { RouterModule } from '@angular/router';
 export class PanelPrincipal implements OnInit {
   dashboard: any = null;
   pacientesLista: any[] = [];
+  pacientesTotal = 0;
   loading = true;
+  errorPacientes = '';
   fechaHoy = new Date();
   pacientesPagina = 0;
   pacientesPorPagina = 5;
 
+  constructor(private pacienteService: PacienteService) {}
+
   ngOnInit(): void {
-    const auth = btoa('odontologo:123456');
-    fetch('http://localhost:8088/api/pacientes?page=0&size=50', {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Basic ' + auth,
-        'Content-Type': 'application/json'
+    this.cargarPacientes();
+  }
+
+  cargarPacientes() {
+    this.loading = true;
+    this.errorPacientes = '';
+    this.pacienteService.listarPaginado(0, 100).subscribe({
+      next: (data: any) => {
+        const lista: any[] = Array.isArray(data) ? data : data.content || [];
+        this.pacientesTotal = data.totalElements || lista.length;
+        this.pacientesLista = lista.map((p: any) => ({
+          id_paciente: p.id_paciente || p.id,
+          id: p.id,
+          nombre: (p.nombre || '') + ' ' + (p.apellido || ''),
+          ultimaVisita: p.ultimaVisita || p.fecha_registro || p.fecha_creacion || '—'
+        }));
+        this.loading = false;
+      },
+      error: (err: any) => {
+        this.errorPacientes = 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8088';
+        this.loading = false;
       }
-    })
-    .then(res => {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    })
-    .then((data: any) => {
-      const lista: any[] = data.content || [];
-      this.pacientesLista = lista.map((p: any) => ({
-        id_paciente: p.id_paciente || p.id,
-        id: p.id,
-        nombre: (p.nombre || '') + ' ' + (p.apellido || ''),
-        ultimaVisita: p.ultimaVisita || p.fecha_registro || p.fecha_creacion || '—'
-      }));
-      this.loading = false;
-    })
-    .catch(() => {
-      this.loading = false;
     });
   }
 

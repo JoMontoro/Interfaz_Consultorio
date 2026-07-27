@@ -3,7 +3,17 @@
   <p>Cargando panel principal...</p>
 </div>
 
-<div *ngIf="!loading" class="dashboard">
+<div *ngIf="errorPacientes && !loading" class="detalle-error">
+  <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  <h2>Error de conexión</h2>
+  <p>{{ errorPacientes }}</p>
+  <button class="btn-primary" (click)="cargarPacientes()">
+    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+    Reintentar
+  </button>
+</div>
+
+<div *ngIf="!loading && !errorPacientes" class="dashboard">
 
   <!-- WELCOME -->
   <div class="welcome-section">
@@ -138,11 +148,11 @@
             <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
             Pacientes Recientes
           </h3>
-          <div class="pagination" *ngIf="totalPaginasPacientes > 1">
+          <div class="pagination" *ngIf="pacientesTotal > pacientesPorPagina">
             <button (click)="anteriorPaginaPacientes()" [disabled]="pacientesPagina === 0">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <span>{{ paginaActualPacientes }}/{{ totalPaginasPacientes }}</span>
+            <span>{{ paginaActualPacientes }}/{{ totalPaginasPacientes }} · {{ pacientesTotal }} registros</span>
             <button (click)="siguientePaginaPacientes()" [disabled]="pacientesPagina >= totalPaginasPacientes - 1">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
             </button>

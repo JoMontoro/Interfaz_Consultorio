@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostBinding } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { Router, RouterModule, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -8,9 +8,11 @@ import { AuthService } from './core/services/auth';
   selector: 'app-root',
   imports: [RouterModule, RouterOutlet, NgIf],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 export class App {
+  @HostBinding('class.login-route') protected loginRoute = false;
+
   protected showSidebar = true;
   protected sidebarCollapsed = false;
   protected dashboardDoctor = 'odontólogo';
@@ -29,6 +31,7 @@ export class App {
     const esLogin = this.router.url.startsWith('/login');
     const esCrearPaciente = this.router.url.startsWith('/pacientes/crear');
     this.showSidebar = !esLogin && !esCrearPaciente;
+    this.loginRoute = esLogin;
   }
 
   toggleSidebar() {

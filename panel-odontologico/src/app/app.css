@@ -48,6 +48,20 @@ body {
   overflow: hidden;
 }
 
+:host(.login-route) {
+  background: #111827;
+}
+
+:host(.login-route) .app-shell,
+:host(.login-route) .main-area,
+:host(.login-route) .content {
+  background: #111827;
+}
+
+:host(.login-route) .content {
+  padding: 0;
+}
+
 /* ============ SIDEBAR ============ */
 
 .sidebar {
