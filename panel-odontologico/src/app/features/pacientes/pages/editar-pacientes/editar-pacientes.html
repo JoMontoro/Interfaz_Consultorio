@@ -1,65 +1,29 @@
-<div class="editar-container">
-
-  <!-- HEADER -->
-  <div class="editar-header">
-
+<div class="page">
+  <div class="page-header">
     <div>
-
-      <h1>
-        ✏️ Editar Paciente
-      </h1>
-
-      <p>
-        Actualiza la información del paciente
-      </p>
-
+      <h1>Editar Paciente</h1>
+      <p class="page-subtitle">Actualice la información del paciente</p>
     </div>
-
+    <a class="btn-outline" routerLink="/pacientes">
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </a>
   </div>
 
-  <!-- FORMULARIO -->
-  <div class="form-card">
-
+  <div class="card form-card">
     <form (ngSubmit)="actualizar()">
-
       <div class="form-grid">
-
-        <!-- NOMBRE -->
         <div class="form-group">
-
-          <label for="nombre">
-            Nombre
-          </label>
-
-          <input
-            id="nombre"
-            type="text"
-            [(ngModel)]="paciente.nombre"
-            name="nombre"
-            placeholder="Ingrese nombre"
-            required
-          >
-
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" [(ngModel)]="paciente.nombre" name="nombre" placeholder="Ingrese nombre" required>
         </div>
 
-        <!-- APELLIDO -->
         <div class="form-group">
-
-          <label for="apellido">
-            Apellido
-          </label>
-
-          <input
-            id="apellido"
-            type="text"
-            [(ngModel)]="paciente.apellido"
-            name="apellido"
-            placeholder="Ingrese apellido"
-            required
-          >
-
+          <label for="apellido">Apellido</label>
+          <input id="apellido" type="text" [(ngModel)]="paciente.apellido" name="apellido" placeholder="Ingrese apellido" required>
         </div>
 
+<<<<<<< HEAD:panel-odontologico/src/app/features/pacientes/pages/editar-pacientes/editar-pacientes.html
         <!-- FECHA NACIMIENTO -->
         <div class="form-group">
 
@@ -75,117 +39,46 @@
             required
           >
 
-        </div>
-
-        <!-- APODERADO -->
+=======
         <div class="form-group">
-
-          <label for="apoderado">
-            Apoderado
-          </label>
-
-          <input
-            id="apoderado"
-            type="text"
-            [(ngModel)]="paciente.apoderado"
-            name="apoderado"
-            placeholder="Ingrese apoderado"
-          >
-
+          <label for="edad">Edad</label>
+          <input id="edad" type="number" [(ngModel)]="paciente.edad" name="edad" placeholder="Edad" required>
+>>>>>>> 9a7f877a337ee6e50b23623bc165a7628285e6da:panel-odontologico/src/app/modules/pacientes/pages/editar-pacientes/editar-pacientes.html
         </div>
 
-        <!-- DIRECCION -->
-        <div class="form-group full-width">
-
-          <label for="direccion">
-            Dirección
-          </label>
-
-          <input
-            id="direccion"
-            type="text"
-            [(ngModel)]="paciente.direccion"
-            name="direccion"
-            placeholder="Ingrese dirección"
-          >
-
-        </div>
-
-        <!-- DNI -->
         <div class="form-group">
-
-          <label for="dni">
-            DNI
-          </label>
-
-          <input
-            id="dni"
-            type="text"
-            [(ngModel)]="paciente.dni"
-            name="dni"
-            placeholder="Ingrese DNI"
-          >
-
+          <label for="apoderado">Apoderado</label>
+          <input id="apoderado" type="text" [(ngModel)]="paciente.apoderado" name="apoderado" placeholder="Ingrese apoderado">
         </div>
 
-        <!-- TELEFONO -->
         <div class="form-group">
-
-          <label for="telefono">
-            Teléfono
-          </label>
-
-          <input
-            id="telefono"
-            type="text"
-            [(ngModel)]="paciente.telefono"
-            name="telefono"
-            placeholder="Ingrese teléfono"
-          >
-
+          <label for="dni">DNI</label>
+          <input id="dni" type="text" [(ngModel)]="paciente.dni" name="dni" placeholder="Ingrese DNI">
         </div>
 
-        <!-- EMAIL -->
-        <div class="form-group full-width">
-
-          <label for="email">
-            Email
-          </label>
-
-          <input
-            id="email"
-            type="email"
-            [(ngModel)]="paciente.email"
-            name="email"
-            placeholder="Ingrese email"
-          >
-
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" type="text" [(ngModel)]="paciente.telefono" name="telefono" placeholder="Ingrese teléfono">
         </div>
 
+        <div class="form-group full">
+          <label for="direccion">Dirección</label>
+          <input id="direccion" type="text" [(ngModel)]="paciente.direccion" name="direccion" placeholder="Ingrese dirección">
+        </div>
+
+        <div class="form-group full">
+          <label for="email">Email</label>
+          <input id="email" type="email" [(ngModel)]="paciente.email" name="email" placeholder="Ingrese email">
+        </div>
       </div>
 
-      <!-- BOTONES -->
-      <div class="btn-container">
-
-        <button
-          type="button"
-          class="btn-cancel"
-          (click)="cancelar()"
-        >
-          Cancelar
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Actualizar Paciente
         </button>
-
-        <button
-          type="submit"
-          class="btn-save"
-        >
-          💾 Actualizar Paciente
-        </button>
-
+        <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
       </div>
-
     </form>
-
   </div>
-
 </div>
