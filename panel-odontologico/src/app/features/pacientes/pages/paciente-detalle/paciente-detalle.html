@@ -1,184 +1,314 @@
-<div *ngIf="loading" class="loading-container">
-  <div class="spinner"></div>
-  <p>Cargando datos del paciente...</p>
+<div class="container-fluid px-4 py-4">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="/pacientes">Pacientes</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ paciente.nombre }} {{ paciente.apellido }}</li>
+    </ol>
+  </nav>
+
+  <ng-container *ngIf="!loading; else cargando">
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between bg-white rounded-4 p-4 shadow-sm mb-4">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-avatar">
+          {{ (paciente.nombre || '?')[0] }}{{ (paciente.apellido || '')[0] }}
+        </div>
+        <div>
+          <h4 class="mb-1 fw-bold text-dark">{{ paciente.nombre }} {{ paciente.apellido }}</h4>
+          <div class="d-flex flex-wrap gap-3 small text-muted">
+            <span><span class="fw-semibold text-dark">DNI:</span> {{ paciente.dni || '—' }}</span>
+            <span><span class="fw-semibold text-dark">Tel:</span> {{ paciente.telefono || '—' }}</span>
+            <span><span class="fw-semibold text-dark">Email:</span> {{ paciente.email || '—' }}</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary rounded-3 px-4 mt-2 mt-sm-0" (click)="abrirEditModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10z"/></svg>
+        Editar
+      </button>
+    </div>
+
+    <ul class="nav nav-tabs border-0 gap-2 mb-4">
+      <li class="nav-item" *ngFor="let t of tabs">
+        <button class="nav-link rounded-3 px-3 py-2 border-0 fw-semibold tab-custom"
+                [class.active]="tab===t.key"
+                [class.text-secondary]="tab!==t.key"
+                [class.bg-white]="tab!==t.key"
+                (click)="tab=t.key">
+          {{ t.label }}
+        </button>
+      </li>
+    </ul>
+
+    <div class="card info-card" *ngIf="tab==='datos'">
+      <h5 class="section-title">Información General</h5>
+      <div class="row g-3">
+        <div class="col-sm-6 col-md-4 col-lg-3" *ngFor="let f of [
+          {label:'Nombre',val:paciente.nombre},
+          {label:'Apellido',val:paciente.apellido},
+          {label:'Fecha Nacimiento',val:paciente.fechaNacimiento},
+          {label:'DNI',val:paciente.dni},
+          {label:'Teléfono',val:paciente.telefono},
+          {label:'Email',val:paciente.email},
+          {label:'Dirección',val:paciente.direccion},
+          {label:'Apoderado',val:paciente.apoderado}
+        ]">
+          <div>
+            <small class="info-label">{{ f.label }}</small>
+            <p class="info-value">{{ f.val || '—' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card info-card" *ngIf="tab==='historial'">
+      <h5 class="section-title">Historial Clínico</h5>
+      <div *ngIf="!historial.antecedentesMedicos && !historial.alergias && !historial.enfermedades && !historial.observacionesGenerales; else historialContent">
+        <div class="empty-state">
+          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg></div>
+          <p class="mb-0">Sin historial clínico registrado</p>
+        </div>
+      </div>
+      <ng-template #historialContent>
+        <div class="row g-3">
+          <div class="col-12" *ngFor="let f of [
+            {label:'Antecedentes Médicos',val:historial.antecedentesMedicos},
+            {label:'Alergias',val:historial.alergias},
+            {label:'Enfermedades',val:historial.enfermedades},
+            {label:'Observaciones Generales',val:historial.observacionesGenerales}
+          ]">
+            <div *ngIf="f.val">
+              <small class="info-label">{{ f.label }}</small>
+              <p class="info-value">{{ f.val }}</p>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="card info-card" *ngIf="tab==='odontograma'">
+      <h5 class="section-title">Odontograma</h5>
+      <div class="odontograma-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
+          <path d="M12 2C9 2 4 4 4 10c0 4 3 8 8 12 5-4 8-8 8-12 0-6-5-8-8-8z"/>
+          <path d="M12 6v4m0 0v4m-4-4h8"/>
+        </svg>
+        <p class="mb-0 fs-5">Odontograma interactivo próximamente</p>
+      </div>
+    </div>
+
+    <div class="card info-card" *ngIf="tab==='casos'">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0 text-dark">Casos Clínicos</h5>
+        <button class="btn btn-primary rounded-3 px-3 mt-2 mt-sm-0" (click)="abrirModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/></svg>
+          Nuevo Caso
+        </button>
+      </div>
+      <div *ngIf="casos.length > 0; else sinCasos">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-primary">
+              <tr>
+                <th class="rounded-start-3">Fecha</th>
+                <th>Motivo</th>
+                <th>Odontólogo</th>
+                <th>Estado</th>
+                <th class="rounded-end-3">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of casos">
+                <td class="text-nowrap">{{ c.fechaInicio }}</td>
+                <td>{{ c.motivoConsulta }}</td>
+                <td>{{ c.odontologoResponsable?.nombre }} {{ c.odontologoResponsable?.apellido }}</td>
+                <td><span class="badge rounded-pill {{estadoBadgeClass(c.estado)}}">{{ c.estado }}</span></td>
+                <td>
+                  <button *ngIf="c.estado !== 'CANCELADO' && c.estado !== 'FINALIZADO'" class="btn btn-sm btn-outline-danger rounded-3" (click)="cancelarCaso(c.id)" title="Cancelar caso">✕</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <ng-template #sinCasos>
+        <div class="empty-state">
+          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+          <p class="mb-0">No hay casos clínicos registrados</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="card info-card" *ngIf="tab==='diagnostico'">
+      <h5 class="section-title">Diagnóstico</h5>
+      <div *ngIf="diagnostico.descripcion; else sinDiagnostico">
+        <p class="info-value">{{ diagnostico.descripcion }}</p>
+      </div>
+      <ng-template #sinDiagnostico>
+        <div class="empty-state">
+          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+          <p class="mb-0">Sin diagnóstico registrado</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="card info-card" *ngIf="tab==='tratamiento'">
+      <h5 class="section-title">Plan de Tratamiento</h5>
+      <div *ngIf="tratamientos.length > 0; else sinTratamientos">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-primary">
+              <tr><th class="rounded-start-3">Tratamiento</th><th>Costo</th><th class="rounded-end-3">Sesiones</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let t of tratamientos">
+                <td>{{ t.tratamiento }}</td><td>S/ {{ t.costo }}</td><td>{{ t.sesiones }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <ng-template #sinTratamientos>
+        <div class="empty-state">
+          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><path d="M10.5 4.5l9 9-6 6-9-9 6-6z"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
+          <p class="mb-0">No hay tratamientos registrados</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="card info-card" *ngIf="tab==='presupuesto'">
+      <h5 class="section-title">Presupuesto</h5>
+      <div *ngIf="presupuesto.total || presupuesto.adelanto || presupuesto.restante; else sinPresupuesto">
+        <div class="row g-3">
+          <div class="col-sm-4" *ngFor="let f of [
+            {label:'Total',val:presupuesto.total ? 'S/ ' + presupuesto.total : null},
+            {label:'Adelanto',val:presupuesto.adelanto ? 'S/ ' + presupuesto.adelanto : null},
+            {label:'Restante',val:presupuesto.restante ? 'S/ ' + presupuesto.restante : null}
+          ]">
+            <div>
+              <small class="info-label">{{ f.label }}</small>
+              <p class="info-value">{{ f.val || '—' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #sinPresupuesto>
+        <div class="empty-state">
+          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M16 10c0-2-1.8-3-4-3s-4 1-4 3c0 2 1.8 3 4 3s4 1 4 3-1.8 3-4 3-4-1-4-3"/></svg></div>
+          <p class="mb-0">Sin presupuesto registrado</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div class="card info-card" *ngIf="tab==='evolucion'">
+      <h5 class="section-title">Evolución del Tratamiento</h5>
+      <div *ngIf="evoluciones.length > 0; else sinEvoluciones">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-primary">
+              <tr><th class="rounded-start-3">Fecha</th><th>Procedimiento</th><th>A Cuenta</th><th class="rounded-end-3">Observaciones</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of evoluciones">
+                <td>{{ e.fecha }}</td><td>{{ e.procedimiento }}</td><td>S/ {{ e.acuenta }}</td><td>{{ e.observaciones }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <ng-template #sinEvoluciones>
+        <div class="empty-state">
+          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <p class="mb-0">No hay evoluciones registradas</p>
+        </div>
+      </ng-template>
+    </div>
+
+  </ng-container>
+
+  <ng-template #cargando>
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  </ng-template>
+
 </div>
 
-<div *ngIf="error" class="detalle-error">
-  <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-  <h2>Error al cargar el paciente</h2>
-  <p>No se pudieron obtener los datos. Verifica que el paciente exista o intenta de nuevo.</p>
-  <button class="btn-primary" routerLink="/panel-principal">Volver al panel principal</button>
-</div>
-
-<div *ngIf="!loading && !error" class="detalle-page">
-  <div class="detalle-header">
-    <div class="detalle-info">
-      <div class="detalle-avatar">{{ (paciente.nombre || '?')[0] }}</div>
-      <div>
-        <h1>{{ paciente.nombre }} {{ paciente.apellido }}</h1>
-        <div class="detalle-meta">
-          <span><strong>DNI:</strong> {{ paciente.dni || '—' }}</span>
-          <span><strong>Tel:</strong> {{ paciente.telefono || '—' }}</span>
-          <span><strong>Edad:</strong> {{ paciente.edad || '—' }}</span>
+<div class="modal fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Nuevo Caso Clínico</h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label fw-semibold text-muted small text-uppercase" style="letter-spacing:.5px;">Motivo de Consulta</label>
+          <textarea [(ngModel)]="nuevoMotivo" class="form-control rounded-3" rows="3" placeholder="Describa el motivo..." [ngModelOptions]="{standalone: true}"></textarea>
         </div>
-<<<<<<< HEAD:panel-odontologico/src/app/features/pacientes/pages/paciente-detalle/paciente-detalle.html
-
-        <div class="field">
-          <label>Apellido</label>
-          <p>{{ paciente.apellido }}</p>
-        </div>
-
-        <div class="field">
-          <label>Fecha Nacimiento</label>
-          <p>{{ paciente.fechaNacimiento }}</p>
-        </div>
-
-        <div class="field">
-          <label>Dirección</label>
-          <p>{{ paciente.direccion }}</p>
-        </div>
-
-        <div class="field">
-          <label>Email</label>
-          <p>{{ paciente.email }}</p>
-        </div>
-
-=======
->>>>>>> 9a7f877a337ee6e50b23623bc165a7628285e6da:panel-odontologico/src/app/modules/pacientes/pages/paciente-detalle/paciente-detalle.html
       </div>
-    </div>
-    <button class="btn-primary" [routerLink]="['/pacientes/editar', paciente.id_paciente || paciente.id]">
-      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      Editar
-    </button>
-  </div>
-
-<<<<<<< HEAD:panel-odontologico/src/app/features/pacientes/pages/paciente-detalle/paciente-detalle.html
-  <!-- HISTORIAL -->
-  <div
-    class="tab-content"
-    *ngIf="tab==='historial'"
-  >
-
-    <div class="card">
-
-      <h3>
-        Historial Clínico
-      </h3>
-
-      <div class="field">
-        <label>Antecedentes Médicos</label>
-        <p>{{ historial.antecedentesMedicos }}</p>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-outline-secondary rounded-3" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary rounded-3 px-4" (click)="crearCaso()" [disabled]="!nuevoMotivo.trim()">Guardar</button>
       </div>
-
-      <div class="field">
-        <label>Alergias</label>
-        <p>{{ historial.alergias }}</p>
-      </div>
-
-      <div class="field">
-        <label>Enfermedades</label>
-        <p>{{ historial.enfermedades }}</p>
-      </div>
-
-      <div class="field">
-        <label>Observaciones Generales</label>
-        <p>{{ historial.observacionesGenerales }}</p>
-      </div>
-
-    </div>
-
-=======
-  <div class="tabs">
-    <button class="tab" [class.active]="tab==='datos'" (click)="tab='datos'">Datos</button>
-    <button class="tab" [class.active]="tab==='historial'" (click)="tab='historial'">Historial</button>
-    <button class="tab" [class.active]="tab==='odontograma'" (click)="tab='odontograma'">Odontograma</button>
-    <button class="tab" [class.active]="tab==='diagnostico'" (click)="tab='diagnostico'">Diagnóstico</button>
-    <button class="tab" [class.active]="tab==='tratamiento'" (click)="tab='tratamiento'">Tratamiento</button>
-    <button class="tab" [class.active]="tab==='presupuesto'" (click)="tab='presupuesto'">Presupuesto</button>
-    <button class="tab" [class.active]="tab==='evolucion'" (click)="tab='evolucion'">Evolución</button>
->>>>>>> 9a7f877a337ee6e50b23623bc165a7628285e6da:panel-odontologico/src/app/modules/pacientes/pages/paciente-detalle/paciente-detalle.html
-  </div>
-
-  <div class="tab-content" *ngIf="tab==='datos'">
-    <div class="card">
-      <h3>Información General</h3>
-      <div class="info-grid">
-        <div class="info-field"><label>Nombre</label><span>{{ paciente.nombre || '—' }}</span></div>
-        <div class="info-field"><label>Apellido</label><span>{{ paciente.apellido || '—' }}</span></div>
-        <div class="info-field"><label>Edad</label><span>{{ paciente.edad || '—' }}</span></div>
-        <div class="info-field"><label>DNI</label><span>{{ paciente.dni || '—' }}</span></div>
-        <div class="info-field"><label>Teléfono</label><span>{{ paciente.telefono || '—' }}</span></div>
-        <div class="info-field"><label>Email</label><span>{{ paciente.email || '—' }}</span></div>
-        <div class="info-field"><label>Dirección</label><span>{{ paciente.direccion || '—' }}</span></div>
-        <div class="info-field"><label>Apoderado</label><span>{{ paciente.apoderado || '—' }}</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="tab-content" *ngIf="tab==='historial'">
-    <div class="card">
-      <h3>Historial Clínico</h3>
-      <div class="info-grid">
-        <div class="info-field full"><label>Motivo de Consulta</label><span>{{ historial.motivo_consulta || '—' }}</span></div>
-        <div class="info-field full"><label>Antecedentes</label><span>{{ historial.antecedentes || '—' }}</span></div>
-        <div class="info-field full"><label>Tejidos Blandos</label><span>{{ historial.tejidos_blandos || '—' }}</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="tab-content" *ngIf="tab==='odontograma'">
-    <div class="card">
-      <h3>Odontograma</h3>
-      <div class="placeholder">Odontograma interactivo próximamente</div>
-    </div>
-  </div>
-
-  <div class="tab-content" *ngIf="tab==='diagnostico'">
-    <div class="card">
-      <h3>Diagnóstico</h3>
-      <p class="text-muted">{{ diagnostico.descripcion || 'Sin diagnóstico registrado' }}</p>
-    </div>
-  </div>
-
-  <div class="tab-content" *ngIf="tab==='tratamiento'">
-    <div class="card">
-      <h3>Plan de Tratamiento</h3>
-      <table class="data-table" *ngIf="tratamientos.length">
-        <thead><tr><th>Tratamiento</th><th>Costo</th><th>Sesiones</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let t of tratamientos">
-            <td>{{ t.tratamiento }}</td><td>S/ {{ t.costo }}</td><td>{{ t.sesiones }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p *ngIf="!tratamientos.length" class="text-center text-muted">No hay tratamientos registrados</p>
-    </div>
-  </div>
-
-  <div class="tab-content" *ngIf="tab==='presupuesto'">
-    <div class="card">
-      <h3>Presupuesto</h3>
-      <div class="info-grid">
-        <div class="info-field"><label>Total</label><span>{{ presupuesto.total ? 'S/ ' + presupuesto.total : '—' }}</span></div>
-        <div class="info-field"><label>Adelanto</label><span>{{ presupuesto.adelanto ? 'S/ ' + presupuesto.adelanto : '—' }}</span></div>
-        <div class="info-field"><label>Restante</label><span>{{ presupuesto.restante ? 'S/ ' + presupuesto.restante : '—' }}</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="tab-content" *ngIf="tab==='evolucion'">
-    <div class="card">
-      <h3>Evolución del Tratamiento</h3>
-      <table class="data-table" *ngIf="evoluciones.length">
-        <thead><tr><th>Fecha</th><th>Procedimiento</th><th>A Cuenta</th><th>Observaciones</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let e of evoluciones">
-            <td>{{ e.fecha }}</td><td>{{ e.procedimiento }}</td><td>S/ {{ e.acuenta }}</td><td>{{ e.observaciones }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <p *ngIf="!evoluciones.length" class="text-center text-muted">No hay evoluciones registradas</p>
     </div>
   </div>
 </div>
+<div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>
+
+<div class="modal fade" [class.show]="showEditModal" [style.display]="showEditModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Editar Paciente</h5>
+        <button type="button" class="btn-close" (click)="cerrarEditModal()"></button>
+      </div>
+      <form (ngSubmit)="guardarEdicion()">
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold text-muted small">Nombre</label>
+              <input type="text" class="form-control rounded-3" [(ngModel)]="editForm.nombre" name="editNombre" required>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold text-muted small">Apellido</label>
+              <input type="text" class="form-control rounded-3" [(ngModel)]="editForm.apellido" name="editApellido" required>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold text-muted small">Fecha Nacimiento</label>
+              <input type="date" class="form-control rounded-3" [(ngModel)]="editForm.fechaNacimiento" name="editFechaNac">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold text-muted small">DNI</label>
+              <input type="text" class="form-control rounded-3" [(ngModel)]="editForm.dni" name="editDni">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold text-muted small">Teléfono</label>
+              <input type="text" class="form-control rounded-3" [(ngModel)]="editForm.telefono" name="editTelefono">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold text-muted small">Email</label>
+              <input type="email" class="form-control rounded-3" [(ngModel)]="editForm.email" name="editEmail">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold text-muted small">Dirección</label>
+              <input type="text" class="form-control rounded-3" [(ngModel)]="editForm.direccion" name="editDireccion">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label fw-semibold text-muted small">Apoderado</label>
+              <input type="text" class="form-control rounded-3" [(ngModel)]="editForm.apoderado" name="editApoderado">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-outline-secondary rounded-3" (click)="cerrarEditModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary rounded-3 px-4">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showEditModal" *ngIf="showEditModal"></div>

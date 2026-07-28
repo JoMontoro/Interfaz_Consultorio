@@ -42,9 +42,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let p of Lista" [class.table-secondary]="p.estado === false">
-            <td class="ps-4 fw-medium">
-              {{ p.nombre }}
-            </td>
+            <td class="ps-4 fw-medium">{{ p.nombre }}</td>
             <td>{{ p.apellido }}</td>
             <td>{{ p.dni }}</td>
             <td>{{ p.telefono }}</td>
@@ -68,7 +66,7 @@
           </tr>
           <tr *ngIf="Lista.length === 0">
             <td colspan="6" class="text-center text-secondary py-5">
-              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" class="mb-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               <p class="mb-0">No hay pacientes registrados</p>
             </td>
           </tr>
@@ -82,116 +80,120 @@
     <small class="text-secondary">Página {{ pagina + 1 }} de {{ totalPages }}</small>
     <div class="btn-group">
       <button class="btn btn-outline-secondary btn-sm" (click)="paginaAnterior()" [disabled]="pagina === 0">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/></svg>
         Anterior
       </button>
       <button class="btn btn-outline-secondary btn-sm" (click)="siguientePagina()" [disabled]="pagina >= totalPages - 1">
         Siguiente
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/></svg>
       </button>
     </div>
   </div>
 
 </div>
 
-<!-- Modal -->
-<div class="modal-backdrop" *ngIf="showModal" (click)="cerrarModal()"></div>
-<div class="modal-custom" *ngIf="showModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="fw-bold mb-0">Nuevo Paciente</h5>
-      <button type="button" class="btn-close" (click)="cerrarModal()"></button>
-    </div>
-    <div class="modal-body">
-      <div class="row g-3">
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Nombre</label>
-          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.nombre" placeholder="Nombre">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Apellido</label>
-          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.apellido" placeholder="Apellido">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">DNI</label>
-          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.dni" placeholder="DNI" maxlength="8" (input)="soloNumeros($event)">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Fecha de Nacimiento</label>
-          <input type="date" class="form-control" [(ngModel)]="nuevoPaciente.fechaNacimiento">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Teléfono</label>
-          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.telefono" placeholder="Teléfono" maxlength="9" (input)="soloNumeros($event)">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Email</label>
-          <input type="email" class="form-control" [(ngModel)]="nuevoPaciente.email" placeholder="Email">
-        </div>
-        <div class="col-12">
-          <label class="form-label small fw-medium text-secondary">Dirección</label>
-          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.direccion" placeholder="Dirección">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Apoderado</label>
-          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.apoderado" placeholder="Apoderado">
+<!-- Nuevo Paciente Modal -->
+<div class="modal fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Nuevo Paciente</h5>
+        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Nombre</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="nuevoPaciente.nombre" [ngModelOptions]="{standalone:true}" placeholder="Nombre">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Apellido</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="nuevoPaciente.apellido" [ngModelOptions]="{standalone:true}" placeholder="Apellido">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">DNI</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="nuevoPaciente.dni" [ngModelOptions]="{standalone:true}" placeholder="DNI" maxlength="8" (input)="soloNumeros($event)">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Fecha de Nacimiento</label>
+            <input type="date" class="form-control rounded-3" [(ngModel)]="nuevoPaciente.fechaNacimiento" [ngModelOptions]="{standalone:true}">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Teléfono</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="nuevoPaciente.telefono" [ngModelOptions]="{standalone:true}" placeholder="Teléfono" maxlength="9" (input)="soloNumeros($event)">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Email</label>
+            <input type="email" class="form-control rounded-3" [(ngModel)]="nuevoPaciente.email" [ngModelOptions]="{standalone:true}" placeholder="Email">
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-medium text-secondary">Dirección</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="nuevoPaciente.direccion" [ngModelOptions]="{standalone:true}" placeholder="Dirección">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Apoderado</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="nuevoPaciente.apoderado" [ngModelOptions]="{standalone:true}" placeholder="Apoderado">
+          </div>
         </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
-      <button type="button" class="btn btn-primary fw-semibold" (click)="guardarPaciente()">Guardar</button>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-outline-secondary rounded-3" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn btn-primary rounded-3 fw-semibold px-4" (click)="guardarPaciente()">Guardar</button>
+      </div>
     </div>
   </div>
 </div>
+<div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>
 
-<!-- Edit Modal -->
-<div class="modal-backdrop" *ngIf="showEditModal" (click)="cerrarEditar()"></div>
-<div class="modal-custom" *ngIf="showEditModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="fw-bold mb-0">Editar Paciente</h5>
-      <button type="button" class="btn-close" (click)="cerrarEditar()"></button>
-    </div>
-    <div class="modal-body">
-      <div class="row g-3">
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Nombre</label>
-          <input type="text" class="form-control" [(ngModel)]="editarPaciente.nombre" placeholder="Nombre">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Apellido</label>
-          <input type="text" class="form-control" [(ngModel)]="editarPaciente.apellido" placeholder="Apellido">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">DNI</label>
-          <input type="text" class="form-control" [(ngModel)]="editarPaciente.dni" placeholder="DNI" maxlength="8" (input)="soloNumeros($event)">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Fecha de Nacimiento</label>
-          <input type="date" class="form-control" [(ngModel)]="editarPaciente.fechaNacimiento">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Teléfono</label>
-          <input type="text" class="form-control" [(ngModel)]="editarPaciente.telefono" placeholder="Teléfono" maxlength="9" (input)="soloNumeros($event)">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Email</label>
-          <input type="email" class="form-control" [(ngModel)]="editarPaciente.email" placeholder="Email">
-        </div>
-        <div class="col-12">
-          <label class="form-label small fw-medium text-secondary">Dirección</label>
-          <input type="text" class="form-control" [(ngModel)]="editarPaciente.direccion" placeholder="Dirección">
-        </div>
-        <div class="col-6">
-          <label class="form-label small fw-medium text-secondary">Apoderado</label>
-          <input type="text" class="form-control" [(ngModel)]="editarPaciente.apoderado" placeholder="Apoderado">
+<!-- Editar Modal -->
+<div class="modal fade" [class.show]="showEditModal" [style.display]="showEditModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Editar Paciente</h5>
+        <button type="button" class="btn-close" (click)="cerrarEditar()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Nombre</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="editarPaciente.nombre" [ngModelOptions]="{standalone:true}" placeholder="Nombre">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Apellido</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="editarPaciente.apellido" [ngModelOptions]="{standalone:true}" placeholder="Apellido">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">DNI</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="editarPaciente.dni" [ngModelOptions]="{standalone:true}" placeholder="DNI" maxlength="8" (input)="soloNumeros($event)">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Fecha de Nacimiento</label>
+            <input type="date" class="form-control rounded-3" [(ngModel)]="editarPaciente.fechaNacimiento" [ngModelOptions]="{standalone:true}">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Teléfono</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="editarPaciente.telefono" [ngModelOptions]="{standalone:true}" placeholder="Teléfono" maxlength="9" (input)="soloNumeros($event)">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Email</label>
+            <input type="email" class="form-control rounded-3" [(ngModel)]="editarPaciente.email" [ngModelOptions]="{standalone:true}" placeholder="Email">
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-medium text-secondary">Dirección</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="editarPaciente.direccion" [ngModelOptions]="{standalone:true}" placeholder="Dirección">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-medium text-secondary">Apoderado</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="editarPaciente.apoderado" [ngModelOptions]="{standalone:true}" placeholder="Apoderado">
+          </div>
         </div>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" (click)="cerrarEditar()">Cancelar</button>
-      <button type="button" class="btn btn-primary fw-semibold" (click)="actualizarPaciente()">Actualizar</button>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-outline-secondary rounded-3" (click)="cerrarEditar()">Cancelar</button>
+        <button class="btn btn-primary rounded-3 fw-semibold px-4" (click)="actualizarPaciente()">Actualizar</button>
+      </div>
     </div>
   </div>
 </div>
+<div class="modal-backdrop fade" [class.show]="showEditModal" *ngIf="showEditModal"></div>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { PacienteService } from '../../module/pacientes/services/paciente';
+import { PacienteService } from '../../core/services/paciente';
 
 @Component({
   selector: 'app-panel-principal',
@@ -34,14 +34,13 @@ export class PanelPrincipal implements OnInit {
         const lista: any[] = Array.isArray(data) ? data : data.content || [];
         this.pacientesTotal = data.totalElements || lista.length;
         this.pacientesLista = lista.map((p: any) => ({
-          id_paciente: p.id_paciente || p.id,
           id: p.id,
           nombre: (p.nombre || '') + ' ' + (p.apellido || ''),
           ultimaVisita: p.ultimaVisita || p.fecha_registro || p.fecha_creacion || '—'
         }));
         this.loading = false;
       },
-      error: (err: any) => {
+      error: () => {
         this.errorPacientes = 'No se pudo conectar con el servidor. Verifica que el backend esté corriendo en http://localhost:8088';
         this.loading = false;
       }
@@ -74,12 +73,8 @@ export class PanelPrincipal implements OnInit {
     }
   }
 
-  obtenerIdPaciente(item: any): number {
-    return item.id_paciente || item.id;
-  }
-
   trackPorId(_index: number, item: any): number {
-    return this.obtenerIdPaciente(item) || _index;
+    return item.id || _index;
   }
 
   trackPorHora(_index: number, item: any): string {

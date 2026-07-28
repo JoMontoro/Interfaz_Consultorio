@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { Component, inject } from '@angular/core';
-=======
-import { Component, HostBinding } from '@angular/core';
->>>>>>> 9a7f877a337ee6e50b23623bc165a7628285e6da
+import { Component, HostBinding, computed } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { Router, RouterModule, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -15,34 +11,37 @@ import { AuthService } from './core/services/auth';
   styleUrls: ['./app.css']
 })
 export class App {
-<<<<<<< HEAD
-  protected title = 'panel-odontologico';
-  protected showSidebar = false;
-  protected sidebarOpen = false;
-  protected auth = inject(AuthService);
-
-  constructor(private router: Router) {
-    this.showSidebar = !this.router.url.startsWith('/login');
-=======
   @HostBinding('class.login-route') protected loginRoute = false;
 
   protected showSidebar = true;
   protected sidebarCollapsed = false;
-  protected dashboardDoctor = 'odontólogo';
+  protected sidebarOpen = false;
+  protected auth: AuthService;
 
-  constructor(private router: Router, private auth: AuthService) {
+  protected titulo = computed(() => {
+    const nombre = this.auth.userProfile()?.nombre || '';
+    return nombre.toLowerCase().endsWith('a') ? 'Dra.' : 'Dr.';
+  });
+
+  protected rolGenero = computed(() => {
+    const nombre = this.auth.userProfile()?.nombre || '';
+    const esFemenino = nombre.toLowerCase().endsWith('a');
+    const rol = this.auth.userProfile()?.rol?.toLowerCase() || '';
+    if (rol === 'odontologo' || rol === 'odontólogo') {
+      return esFemenino ? 'Odontóloga' : 'Odontólogo';
+    }
+    // para otros roles podrías agregar más casos
+    return this.auth.userProfile()?.rol || '';
+  });
+
+  constructor(private router: Router, auth: AuthService) {
+    this.auth = auth;
     this.actualizarLayout();
->>>>>>> 9a7f877a337ee6e50b23623bc165a7628285e6da
 
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
       .subscribe(() => {
-<<<<<<< HEAD
-        this.showSidebar = !this.router.url.startsWith('/login');
-        this.sidebarOpen = false;
-=======
         this.actualizarLayout();
->>>>>>> 9a7f877a337ee6e50b23623bc165a7628285e6da
       });
   }
 
