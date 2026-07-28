@@ -1,0 +1,72 @@
+<div class="login-wrapper">
+  <div class="login-card-wrapper">
+    <div class="card border-0 shadow login-card">
+      <div class="card-body p-4 p-sm-5">
+
+        <div class="text-center mb-4">
+          <div class="login-logo mx-auto mb-3" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2C9.5 2 8 3.5 8 6c0 1.5.5 2.5 1.5 3.5C8 10 7 12 7 14c0 4.5 2.5 6 5 8 2.5-2 5-3.5 5-8 0-2-1-4-2.5-4.5C15.5 8.5 16 7.5 16 6c0-2.5-1.5-4-4-4Z"/>
+            </svg>
+          </div>
+          <h4 class="fw-bold mb-1">Consultorio Odontol&#243;gico</h4>
+          <p class="text-secondary small mb-0">Ingresa tus credenciales</p>
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-danger d-flex align-items-center mb-3 py-2 px-3 small border-0 rounded-4" role="alert">
+          <svg class="me-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div>{{ errorMessage }}</div>
+        </div>
+
+        <form #loginForm="ngForm" (ngSubmit)="login(loginForm)" novalidate>
+
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              [class.is-invalid]="usernameInput.invalid && (usernameInput.dirty || usernameInput.touched || loginForm.submitted)"
+              id="floatingUser"
+              placeholder="Usuario"
+              [(ngModel)]="username"
+              name="username"
+              #usernameInput="ngModel"
+              required
+              autocomplete="username"
+            >
+            <label for="floatingUser">Usuario</label>
+            <div class="invalid-feedback">El usuario es requerido.</div>
+          </div>
+
+          <div class="form-floating mb-4">
+            <input
+              type="password"
+              class="form-control"
+              [class.is-invalid]="passwordInput.invalid && (passwordInput.dirty || passwordInput.touched || loginForm.submitted)"
+              id="floatingPass"
+              placeholder="Contrase&#241;a"
+              [(ngModel)]="password"
+              name="password"
+              #passwordInput="ngModel"
+              required
+              autocomplete="current-password"
+            >
+            <label for="floatingPass">Contrase&#241;a</label>
+            <div class="invalid-feedback">La contrase&#241;a es requerida.</div>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg fw-semibold" [disabled]="loading">
+              <span *ngIf="!loading">Ingresar</span>
+              <span *ngIf="loading" class="d-flex align-items-center justify-content-center">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Ingresando...
+              </span>
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>

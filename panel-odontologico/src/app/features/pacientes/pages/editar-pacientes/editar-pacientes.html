@@ -1,0 +1,191 @@
+<div class="editar-container">
+
+  <!-- HEADER -->
+  <div class="editar-header">
+
+    <div>
+
+      <h1>
+        ✏️ Editar Paciente
+      </h1>
+
+      <p>
+        Actualiza la información del paciente
+      </p>
+
+    </div>
+
+  </div>
+
+  <!-- FORMULARIO -->
+  <div class="form-card">
+
+    <form (ngSubmit)="actualizar()">
+
+      <div class="form-grid">
+
+        <!-- NOMBRE -->
+        <div class="form-group">
+
+          <label for="nombre">
+            Nombre
+          </label>
+
+          <input
+            id="nombre"
+            type="text"
+            [(ngModel)]="paciente.nombre"
+            name="nombre"
+            placeholder="Ingrese nombre"
+            required
+          >
+
+        </div>
+
+        <!-- APELLIDO -->
+        <div class="form-group">
+
+          <label for="apellido">
+            Apellido
+          </label>
+
+          <input
+            id="apellido"
+            type="text"
+            [(ngModel)]="paciente.apellido"
+            name="apellido"
+            placeholder="Ingrese apellido"
+            required
+          >
+
+        </div>
+
+        <!-- FECHA NACIMIENTO -->
+        <div class="form-group">
+
+          <label for="fechaNacimiento">
+            Fecha Nacimiento
+          </label>
+
+          <input
+            id="fechaNacimiento"
+            type="date"
+            [(ngModel)]="paciente.fechaNacimiento"
+            name="fechaNacimiento"
+            required
+          >
+
+        </div>
+
+        <!-- APODERADO -->
+        <div class="form-group">
+
+          <label for="apoderado">
+            Apoderado
+          </label>
+
+          <input
+            id="apoderado"
+            type="text"
+            [(ngModel)]="paciente.apoderado"
+            name="apoderado"
+            placeholder="Ingrese apoderado"
+          >
+
+        </div>
+
+        <!-- DIRECCION -->
+        <div class="form-group full-width">
+
+          <label for="direccion">
+            Dirección
+          </label>
+
+          <input
+            id="direccion"
+            type="text"
+            [(ngModel)]="paciente.direccion"
+            name="direccion"
+            placeholder="Ingrese dirección"
+          >
+
+        </div>
+
+        <!-- DNI -->
+        <div class="form-group">
+
+          <label for="dni">
+            DNI
+          </label>
+
+          <input
+            id="dni"
+            type="text"
+            [(ngModel)]="paciente.dni"
+            name="dni"
+            placeholder="Ingrese DNI"
+          >
+
+        </div>
+
+        <!-- TELEFONO -->
+        <div class="form-group">
+
+          <label for="telefono">
+            Teléfono
+          </label>
+
+          <input
+            id="telefono"
+            type="text"
+            [(ngModel)]="paciente.telefono"
+            name="telefono"
+            placeholder="Ingrese teléfono"
+          >
+
+        </div>
+
+        <!-- EMAIL -->
+        <div class="form-group full-width">
+
+          <label for="email">
+            Email
+          </label>
+
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="paciente.email"
+            name="email"
+            placeholder="Ingrese email"
+          >
+
+        </div>
+
+      </div>
+
+      <!-- BOTONES -->
+      <div class="btn-container">
+
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="cancelar()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="btn-save"
+        >
+          💾 Actualizar Paciente
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>

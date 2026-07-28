@@ -1,0 +1,197 @@
+<div class="px-3 px-md-4 py-4">
+
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
+    <div>
+      <h4 class="fw-bold mb-1">Pacientes</h4>
+      <p class="text-secondary small mb-0">Gestiona la información de tus pacientes.</p>
+    </div>
+    <button class="btn btn-primary fw-semibold d-flex align-items-center gap-2" (click)="abrirModal()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nuevo Paciente
+    </button>
+  </div>
+
+  <!-- Search -->
+  <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+    <div class="input-group" style="max-width: 320px;">
+      <span class="input-group-text bg-white border-end-0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <input type="text" class="form-control border-start-0 ps-0" placeholder="Buscar paciente..." (input)="buscar($event)">
+    </div>
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="mostrarOcultos" [checked]="mostrarOcultos" (change)="toggleOcultos()">
+      <label class="form-check-label small text-secondary" for="mostrarOcultos">Mostrar ocultos</label>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card border-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">Nombre</th>
+            <th>Apellido</th>
+            <th>DNI</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th class="pe-4 text-end">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of Lista" [class.table-secondary]="p.estado === false">
+            <td class="ps-4 fw-medium">
+              {{ p.nombre }}
+            </td>
+            <td>{{ p.apellido }}</td>
+            <td>{{ p.dni }}</td>
+            <td>{{ p.telefono }}</td>
+            <td class="text-secondary small">{{ p.email || '—' }}</td>
+            <td class="pe-4 text-end">
+              <div class="d-flex gap-1 justify-content-end">
+                <button class="btn btn-sm btn-outline-primary border-0" [routerLink]="['/pacientes/detalle', p.id]" title="Ver detalle">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+                <button class="btn btn-sm btn-outline-success border-0" (click)="abrirEditar(p.id)" title="Editar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button *ngIf="p.estado === false" class="btn btn-sm btn-outline-warning border-0" (click)="reactivar(p.id)" title="Reactivar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                </button>
+                <button *ngIf="p.estado !== false" class="btn btn-sm btn-outline-danger border-0" (click)="eliminar(p.id)" title="Desactivar">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="Lista.length === 0">
+            <td colspan="6" class="text-center text-secondary py-5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <p class="mb-0">No hay pacientes registrados</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="d-flex justify-content-between align-items-center mt-3" *ngIf="totalPages > 0">
+    <small class="text-secondary">Página {{ pagina + 1 }} de {{ totalPages }}</small>
+    <div class="btn-group">
+      <button class="btn btn-outline-secondary btn-sm" (click)="paginaAnterior()" [disabled]="pagina === 0">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Anterior
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" (click)="siguientePagina()" [disabled]="pagina >= totalPages - 1">
+        Siguiente
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="cerrarModal()"></div>
+<div class="modal-custom" *ngIf="showModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="fw-bold mb-0">Nuevo Paciente</h5>
+      <button type="button" class="btn-close" (click)="cerrarModal()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Nombre</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.nombre" placeholder="Nombre">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Apellido</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.apellido" placeholder="Apellido">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">DNI</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.dni" placeholder="DNI" maxlength="8" (input)="soloNumeros($event)">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Fecha de Nacimiento</label>
+          <input type="date" class="form-control" [(ngModel)]="nuevoPaciente.fechaNacimiento">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Teléfono</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.telefono" placeholder="Teléfono" maxlength="9" (input)="soloNumeros($event)">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Email</label>
+          <input type="email" class="form-control" [(ngModel)]="nuevoPaciente.email" placeholder="Email">
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-medium text-secondary">Dirección</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.direccion" placeholder="Dirección">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Apoderado</label>
+          <input type="text" class="form-control" [(ngModel)]="nuevoPaciente.apoderado" placeholder="Apoderado">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+      <button type="button" class="btn btn-primary fw-semibold" (click)="guardarPaciente()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-backdrop" *ngIf="showEditModal" (click)="cerrarEditar()"></div>
+<div class="modal-custom" *ngIf="showEditModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="fw-bold mb-0">Editar Paciente</h5>
+      <button type="button" class="btn-close" (click)="cerrarEditar()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Nombre</label>
+          <input type="text" class="form-control" [(ngModel)]="editarPaciente.nombre" placeholder="Nombre">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Apellido</label>
+          <input type="text" class="form-control" [(ngModel)]="editarPaciente.apellido" placeholder="Apellido">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">DNI</label>
+          <input type="text" class="form-control" [(ngModel)]="editarPaciente.dni" placeholder="DNI" maxlength="8" (input)="soloNumeros($event)">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Fecha de Nacimiento</label>
+          <input type="date" class="form-control" [(ngModel)]="editarPaciente.fechaNacimiento">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Teléfono</label>
+          <input type="text" class="form-control" [(ngModel)]="editarPaciente.telefono" placeholder="Teléfono" maxlength="9" (input)="soloNumeros($event)">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Email</label>
+          <input type="email" class="form-control" [(ngModel)]="editarPaciente.email" placeholder="Email">
+        </div>
+        <div class="col-12">
+          <label class="form-label small fw-medium text-secondary">Dirección</label>
+          <input type="text" class="form-control" [(ngModel)]="editarPaciente.direccion" placeholder="Dirección">
+        </div>
+        <div class="col-6">
+          <label class="form-label small fw-medium text-secondary">Apoderado</label>
+          <input type="text" class="form-control" [(ngModel)]="editarPaciente.apoderado" placeholder="Apoderado">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="cerrarEditar()">Cancelar</button>
+      <button type="button" class="btn btn-primary fw-semibold" (click)="actualizarPaciente()">Actualizar</button>
+    </div>
+  </div>
+</div>

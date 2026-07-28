@@ -1,32 +1,18 @@
-import { Injectable } from '@angular/core';
-
-import {
-  HttpClient,
-  HttpHeaders
-} from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { AuthService } from './auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
 
-  private apiUrl =
-    'http://localhost:8088/api/dashboard';
+  private apiUrl = 'http://localhost:8088/api/dashboard';
+  private auth = inject(AuthService);
 
   constructor(private http: HttpClient) {}
 
-  private headers = new HttpHeaders({
-    Authorization:
-      'Basic ' + btoa('odontologo:123456')
-  });
-
   obtenerDashboard() {
-
-    return this.http.get<any>(
-      this.apiUrl,
-      { headers: this.headers }
-    );
-
+    return this.http.get<any>(this.apiUrl, { headers: this.auth.getAuthHeaders() });
   }
-
 }

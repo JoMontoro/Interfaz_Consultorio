@@ -1,0 +1,84 @@
+:host {
+  display: block;
+  min-height: 100%;
+  background: #ECEEF0;
+}
+
+.table > thead > tr > th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6B7280;
+  font-weight: 600;
+}
+
+.table > tbody > tr > td {
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.btn-outline-primary:hover svg,
+.btn-outline-success:hover svg,
+.btn-outline-danger:hover svg {
+  stroke: #fff;
+}
+
+.btn-outline-primary:hover {
+  background-color: #3B82F6;
+  color: #fff;
+}
+
+.btn-outline-success:hover {
+  background-color: #10B981;
+  color: #fff;
+}
+
+.btn-outline-danger:hover {
+  background-color: #EF4444;
+  color: #fff;
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.modal-custom {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-custom .modal-content {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.modal-custom .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+
+.modal-custom .modal-body {
+  padding: 20px 24px;
+}
+
+.modal-custom .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 24px 20px;
+}

@@ -1,0 +1,79 @@
+<div class="perfil-container py-4 px-3 px-md-4">
+
+  <h1 class="h3 fw-bold mb-4">Mi Perfil</h1>
+
+  <div class="row g-4">
+
+    <!-- Avatar Section -->
+    <div class="col-12 col-md-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center p-4">
+
+          <div class="avatar-wrapper mb-3">
+            <img *ngIf="preview || auth.fotoUrl()"
+                 [src]="preview || auth.fotoUrl()!"
+                 class="avatar-img rounded-3 object-fit-cover"
+                 alt="Foto de perfil">
+            <div *ngIf="!preview && !auth.fotoUrl()"
+                 class="avatar-placeholder rounded-3 d-flex align-items-center justify-content-center fw-bold text-primary">
+              {{ auth.userProfile()?.nombre?.charAt(0) }}{{ auth.userProfile()?.apellido?.charAt(0) }}
+            </div>
+          </div>
+
+          <label class="btn btn-outline-primary btn-sm w-100">
+            Cambiar Foto
+            <input type="file" accept="image/*" (change)="onFotoSeleccionada($event)" class="d-none">
+          </label>
+
+          <div *ngIf="subiendo" class="mt-2">
+            <div class="spinner-border spinner-border-sm text-primary" role="status">
+              <span class="visually-hidden">Subiendo...</span>
+            </div>
+            <small class="text-secondary ms-1">Subiendo foto...</small>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="col-12 col-md-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+
+          <h5 class="fw-bold mb-3">Informaci&oacute;n Personal</h5>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-secondary">Usuario</label>
+            <input class="form-control" [value]="auth.userProfile()?.username" disabled>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Nombre</label>
+              <input class="form-control" [(ngModel)]="nombre" placeholder="Nombre">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label small fw-semibold text-secondary">Apellido</label>
+              <input class="form-control" [(ngModel)]="apellido" placeholder="Apellido">
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-end">
+            <button class="btn btn-primary fw-semibold px-4" (click)="guardar()" [disabled]="guardando">
+              <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1" role="status"></span>
+              Guardar Cambios
+            </button>
+          </div>
+
+          <div *ngIf="mensaje" class="alert mt-3 mb-0 py-2 small" [class.alert-success]="exito" [class.alert-danger]="!exito">
+            {{ mensaje }}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
