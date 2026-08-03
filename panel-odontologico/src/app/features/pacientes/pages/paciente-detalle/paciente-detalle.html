@@ -29,162 +29,26 @@
       </button>
     </div>
 
-    <ul class="nav nav-tabs border-0 gap-2 mb-4">
-      <li class="nav-item" *ngFor="let t of tabs">
-        <button class="nav-link rounded-3 px-3 py-2 border-0 fw-semibold tab-custom"
-                [class.active]="tab===t.key"
-                [class.text-secondary]="tab!==t.key"
-                [class.bg-white]="tab!==t.key"
-                (click)="tab=t.key">
-          {{ t.label }}
-        </button>
-      </li>
-    </ul>
+    <!-- ============ FICHA CLÍNICA ============ -->
+    <div class="ficha">
 
-    <div class="card info-card" *ngIf="tab==='datos'">
-      <h5 class="section-title">Información General</h5>
-      <div class="row g-3">
-        <div class="col-sm-6 col-md-4 col-lg-3" *ngFor="let f of [
-          {label:'Nombre',val:paciente.nombre},
-          {label:'Apellido',val:paciente.apellido},
-          {label:'Fecha Nacimiento',val:paciente.fechaNacimiento},
-          {label:'DNI',val:paciente.dni},
-          {label:'Teléfono',val:paciente.telefono},
-          {label:'Email',val:paciente.email},
-          {label:'Dirección',val:paciente.direccion},
-          {label:'Apoderado',val:paciente.apoderado}
-        ]">
-          <div>
-            <small class="info-label">{{ f.label }}</small>
-            <p class="info-value">{{ f.val || '—' }}</p>
-          </div>
+      <!-- 1. ANAMNESIS -->
+      <div class="card info-card mb-4">
+        <div class="section-head">
+          <span class="section-num">1</span>
+          <h5 class="section-title mb-0">Anamnesis</h5>
+          <span class="section-rule"></span>
         </div>
-      </div>
-    </div>
-
-    <div class="card info-card" *ngIf="tab==='historial'">
-      <h5 class="section-title">Historial Clínico</h5>
-      <div *ngIf="!historial.antecedentesMedicos && !historial.alergias && !historial.enfermedades && !historial.observacionesGenerales; else historialContent">
-        <div class="empty-state">
-          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg></div>
-          <p class="mb-0">Sin historial clínico registrado</p>
-        </div>
-      </div>
-      <ng-template #historialContent>
         <div class="row g-3">
-          <div class="col-12" *ngFor="let f of [
-            {label:'Antecedentes Médicos',val:historial.antecedentesMedicos},
-            {label:'Alergias',val:historial.alergias},
-            {label:'Enfermedades',val:historial.enfermedades},
-            {label:'Observaciones Generales',val:historial.observacionesGenerales}
-          ]">
-            <div *ngIf="f.val">
-              <small class="info-label">{{ f.label }}</small>
-              <p class="info-value">{{ f.val }}</p>
-            </div>
-          </div>
-        </div>
-      </ng-template>
-    </div>
-
-    <div class="card info-card" *ngIf="tab==='odontograma'">
-      <h5 class="section-title">Odontograma</h5>
-      <div class="odontograma-placeholder">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
-          <path d="M12 2C9 2 4 4 4 10c0 4 3 8 8 12 5-4 8-8 8-12 0-6-5-8-8-8z"/>
-          <path d="M12 6v4m0 0v4m-4-4h8"/>
-        </svg>
-        <p class="mb-0 fs-5">Odontograma interactivo próximamente</p>
-      </div>
-    </div>
-
-    <div class="card info-card" *ngIf="tab==='casos'">
-      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-        <h5 class="fw-bold mb-0 text-dark">Casos Clínicos</h5>
-        <button class="btn btn-primary rounded-3 px-3 mt-2 mt-sm-0" (click)="abrirModal()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/></svg>
-          Nuevo Caso
-        </button>
-      </div>
-      <div *ngIf="casos.length > 0; else sinCasos">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-primary">
-              <tr>
-                <th class="rounded-start-3">Fecha</th>
-                <th>Motivo</th>
-                <th>Odontólogo</th>
-                <th>Estado</th>
-                <th class="rounded-end-3">Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let c of casos">
-                <td class="text-nowrap">{{ c.fechaInicio }}</td>
-                <td>{{ c.motivoConsulta }}</td>
-                <td>{{ c.odontologoResponsable?.nombre }} {{ c.odontologoResponsable?.apellido }}</td>
-                <td><span class="badge rounded-pill {{estadoBadgeClass(c.estado)}}">{{ c.estado }}</span></td>
-                <td>
-                  <button *ngIf="c.estado !== 'CANCELADO' && c.estado !== 'FINALIZADO'" class="btn btn-sm btn-outline-danger rounded-3" (click)="cancelarCaso(c.id)" title="Cancelar caso">✕</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <ng-template #sinCasos>
-        <div class="empty-state">
-          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
-          <p class="mb-0">No hay casos clínicos registrados</p>
-        </div>
-      </ng-template>
-    </div>
-
-    <div class="card info-card" *ngIf="tab==='diagnostico'">
-      <h5 class="section-title">Diagnóstico</h5>
-      <div *ngIf="diagnostico.descripcion; else sinDiagnostico">
-        <p class="info-value">{{ diagnostico.descripcion }}</p>
-      </div>
-      <ng-template #sinDiagnostico>
-        <div class="empty-state">
-          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-          <p class="mb-0">Sin diagnóstico registrado</p>
-        </div>
-      </ng-template>
-    </div>
-
-    <div class="card info-card" *ngIf="tab==='tratamiento'">
-      <h5 class="section-title">Plan de Tratamiento</h5>
-      <div *ngIf="tratamientos.length > 0; else sinTratamientos">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-primary">
-              <tr><th class="rounded-start-3">Tratamiento</th><th>Costo</th><th class="rounded-end-3">Sesiones</th></tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let t of tratamientos">
-                <td>{{ t.tratamiento }}</td><td>S/ {{ t.costo }}</td><td>{{ t.sesiones }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <ng-template #sinTratamientos>
-        <div class="empty-state">
-          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><path d="M10.5 4.5l9 9-6 6-9-9 6-6z"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
-          <p class="mb-0">No hay tratamientos registrados</p>
-        </div>
-      </ng-template>
-    </div>
-
-    <div class="card info-card" *ngIf="tab==='presupuesto'">
-      <h5 class="section-title">Presupuesto</h5>
-      <div *ngIf="presupuesto.total || presupuesto.adelanto || presupuesto.restante; else sinPresupuesto">
-        <div class="row g-3">
-          <div class="col-sm-4" *ngFor="let f of [
-            {label:'Total',val:presupuesto.total ? 'S/ ' + presupuesto.total : null},
-            {label:'Adelanto',val:presupuesto.adelanto ? 'S/ ' + presupuesto.adelanto : null},
-            {label:'Restante',val:presupuesto.restante ? 'S/ ' + presupuesto.restante : null}
+          <div class="col-sm-6 col-md-4 col-lg-3" *ngFor="let f of [
+            {label:'Nombre',val:paciente.nombre},
+            {label:'Apellido',val:paciente.apellido},
+            {label:'Fecha Nacimiento',val:paciente.fechaNacimiento},
+            {label:'DNI',val:paciente.dni},
+            {label:'Teléfono',val:paciente.telefono},
+            {label:'Email',val:paciente.email},
+            {label:'Dirección',val:paciente.direccion},
+            {label:'Apoderado',val:paciente.apoderado}
           ]">
             <div>
               <small class="info-label">{{ f.label }}</small>
@@ -193,36 +57,126 @@
           </div>
         </div>
       </div>
-      <ng-template #sinPresupuesto>
-        <div class="empty-state">
-          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M16 10c0-2-1.8-3-4-3s-4 1-4 3c0 2 1.8 3 4 3s4 1 4 3-1.8 3-4 3-4-1-4-3"/></svg></div>
-          <p class="mb-0">Sin presupuesto registrado</p>
-        </div>
-      </ng-template>
-    </div>
 
-    <div class="card info-card" *ngIf="tab==='evolucion'">
-      <h5 class="section-title">Evolución del Tratamiento</h5>
-      <div *ngIf="evoluciones.length > 0; else sinEvoluciones">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-primary">
-              <tr><th class="rounded-start-3">Fecha</th><th>Procedimiento</th><th>A Cuenta</th><th class="rounded-end-3">Observaciones</th></tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let e of evoluciones">
-                <td>{{ e.fecha }}</td><td>{{ e.procedimiento }}</td><td>S/ {{ e.acuenta }}</td><td>{{ e.observaciones }}</td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- 2. MOTIVO DE CONSULTA -->
+      <div class="card info-card mb-4">
+        <div class="section-head">
+          <span class="section-num">2</span>
+          <h5 class="section-title mb-0">Motivo de Consulta</h5>
+          <span class="section-rule"></span>
+        </div>
+        <div class="motivo-edit">
+          <textarea class="form-control rounded-3" rows="3" [(ngModel)]="motivoForm" [ngModelOptions]="{standalone: true}" placeholder="Describa el motivo de consulta..."></textarea>
+          <div class="text-end mt-2">
+            <button class="btn btn-sm btn-primary rounded-3 px-3" (click)="guardarMotivo()">{{ casoActivo ? 'Guardar motivo' : 'Agregar motivo' }}</button>
+          </div>
         </div>
       </div>
-      <ng-template #sinEvoluciones>
-        <div class="empty-state">
-          <div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5" width="28" height="28"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
-          <p class="mb-0">No hay evoluciones registradas</p>
+
+      <!-- 3. ANTECEDENTES DEL PACIENTE -->
+      <div class="card info-card mb-4">
+        <div class="section-head">
+          <span class="section-num">3</span>
+          <h5 class="section-title mb-0">Antecedentes del Paciente</h5>
+          <span class="section-rule"></span>
         </div>
-      </ng-template>
+        <div class="row g-3">
+          <div class="col-12">
+            <small class="info-label">Antecedentes Médicos</small>
+            <textarea class="form-control rounded-3" rows="2" [(ngModel)]="histForm.antecedentesMedicos" [ngModelOptions]="{standalone: true}" placeholder="Ej. hipertensión, diabetes, cirugías previas..."></textarea>
+          </div>
+          <div class="col-12">
+            <small class="info-label">Alergias</small>
+            <textarea class="form-control rounded-3" rows="2" [(ngModel)]="histForm.alergias" [ngModelOptions]="{standalone: true}" placeholder="Ej. penicilina, látex..."></textarea>
+          </div>
+          <div class="col-12">
+            <small class="info-label">Enfermedades</small>
+            <textarea class="form-control rounded-3" rows="2" [(ngModel)]="histForm.enfermedades" [ngModelOptions]="{standalone: true}" placeholder="Enfermedades actuales o pasadas..."></textarea>
+          </div>
+          <div class="col-12">
+            <small class="info-label">Observaciones Generales</small>
+            <textarea class="form-control rounded-3" rows="2" [(ngModel)]="histForm.observacionesGenerales" [ngModelOptions]="{standalone: true}" placeholder="Observaciones adicionales..."></textarea>
+          </div>
+        </div>
+        <div class="text-end mt-2">
+          <button class="btn btn-sm btn-primary rounded-3 px-3" (click)="guardarAntecedentes()">Guardar antecedentes</button>
+        </div>
+      </div>
+
+      <!-- 4. ODONTOGRAMA -->
+      <div class="card info-card mb-4">
+        <div class="section-head">
+          <span class="section-num">4</span>
+          <h5 class="section-title mb-0">Odontograma</h5>
+          <span class="section-rule"></span>
+        </div>
+        <div class="odontograma">
+          <div class="odonto-arch">
+            <div class="odonto-half">
+              <span class="diente" [class.d-caries]="estadoDiente(d)==='caries'" [class.d-obturado]="estadoDiente(d)==='obturado'" [class.d-extraido]="estadoDiente(d)==='extraido'" *ngFor="let d of arcoSuperiorIzq" (click)="ciclarDiente(d)" title="Clic para cambiar el estado">{{ d }}</span>
+            </div>
+            <div class="odonto-midline"><span>Línea Media</span></div>
+            <div class="odonto-half">
+              <span class="diente" [class.d-caries]="estadoDiente(d)==='caries'" [class.d-obturado]="estadoDiente(d)==='obturado'" [class.d-extraido]="estadoDiente(d)==='extraido'" *ngFor="let d of arcoSuperiorDer" (click)="ciclarDiente(d)" title="Clic para cambiar el estado">{{ d }}</span>
+            </div>
+          </div>
+          <div class="odonto-arch">
+            <div class="odonto-half">
+              <span class="diente" [class.d-caries]="estadoDiente(d)==='caries'" [class.d-obturado]="estadoDiente(d)==='obturado'" [class.d-extraido]="estadoDiente(d)==='extraido'" *ngFor="let d of arcoInferiorIzq" (click)="ciclarDiente(d)" title="Clic para cambiar el estado">{{ d }}</span>
+            </div>
+            <div class="odonto-midline"><span>Línea Media</span></div>
+            <div class="odonto-half">
+              <span class="diente" [class.d-caries]="estadoDiente(d)==='caries'" [class.d-obturado]="estadoDiente(d)==='obturado'" [class.d-extraido]="estadoDiente(d)==='extraido'" *ngFor="let d of arcoInferiorDer" (click)="ciclarDiente(d)" title="Clic para cambiar el estado">{{ d }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="odonto-leyenda mt-3">
+          <span class="odonto-leyenda-item"><span class="leyenda-chip"></span> Sano</span>
+          <span class="odonto-leyenda-item"><span class="leyenda-chip chip-caries"></span> Caries</span>
+          <span class="odonto-leyenda-item"><span class="leyenda-chip chip-obturado"></span> Obturado</span>
+          <span class="odonto-leyenda-item"><span class="leyenda-chip chip-extraido"></span> Extraído</span>
+          <span class="text-muted ms-auto small">Clic sobre cada diente para cambiar su estado</span>
+        </div>
+      </div>
+
+      <!-- 5. TEJIDOS BLANDOS -->
+      <div class="card info-card mb-4">
+        <div class="section-head">
+          <span class="section-num">5</span>
+          <h5 class="section-title mb-0">Tejidos Blandos</h5>
+          <span class="section-rule"></span>
+        </div>
+        <div class="row g-3">
+          <div class="col-sm-6 col-md-4 col-lg-3" *ngFor="let t of tejidosBlandos">
+            <div>
+              <small class="info-label">{{ t.label }}</small>
+              <input type="text" class="form-control form-control-sm rounded-3" [(ngModel)]="t.valor" [ngModelOptions]="{standalone: true}" placeholder="Sin valoración">
+            </div>
+          </div>
+        </div>
+        <p class="small text-muted mt-2 mb-0">* Los tejidos blandos se registran en pantalla (sin guardado en base de datos).</p>
+      </div>
+
+      <!-- ACCIONES FINALES (cierre de la ficha) -->
+      <div class="ficha-acciones">
+        <button class="btn btn-outline-primary rounded-3 px-4" (click)="abrirConsentimiento()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>
+          Consentimiento informado
+        </button>
+        <button class="btn btn-outline-danger rounded-3 px-4" (click)="finalizarCaso()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9zM2 4v8h12V4H2z"/><path d="M11 7a1 1 0 1 1 0 2 1 1 0 0 1 0-2zM7.5 6.5A.5.5 0 0 1 8 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5z"/></svg>
+          Finalizar
+        </button>
+        <button class="btn btn-primary rounded-3 px-4" (click)="abrirFirmar()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M6.5 6a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5zM9.5 6a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z"/><path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zM4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/></svg>
+          Firmar
+        </button>
+        <button class="btn btn-outline-success rounded-3 px-4" (click)="abrirPago()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M16 10c0-2-1.8-3-4-3s-4 1-4 3c0 2 1.8 3 4 3s4 1 4 3-1.8 3-4 3-4-1-4-3"/></svg>
+          Pago
+        </button>
+      </div>
+
     </div>
 
   </ng-container>
@@ -237,28 +191,7 @@
 
 </div>
 
-<div class="modal fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow rounded-4">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="fw-bold">Nuevo Caso Clínico</h5>
-        <button type="button" class="btn-close" (click)="cerrarModal()"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label class="form-label fw-semibold text-muted small text-uppercase" style="letter-spacing:.5px;">Motivo de Consulta</label>
-          <textarea [(ngModel)]="nuevoMotivo" class="form-control rounded-3" rows="3" placeholder="Describa el motivo..." [ngModelOptions]="{standalone: true}"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer border-0 pt-0">
-        <button class="btn btn-outline-secondary rounded-3" (click)="cerrarModal()">Cancelar</button>
-        <button class="btn btn-primary rounded-3 px-4" (click)="crearCaso()" [disabled]="!nuevoMotivo.trim()">Guardar</button>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>
-
+<!-- MODAL EDICIÓN -->
 <div class="modal fade" [class.show]="showEditModal" [style.display]="showEditModal ? 'block' : 'none'" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content border-0 shadow rounded-4">
@@ -312,3 +245,102 @@
   </div>
 </div>
 <div class="modal-backdrop fade" [class.show]="showEditModal" *ngIf="showEditModal"></div>
+
+<!-- MODAL CONSENTIMIENTO INFORMADO -->
+<div class="modal fade" [class.show]="showConsentimiento" [style.display]="showConsentimiento ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Consentimiento Informado</h5>
+        <button type="button" class="btn-close" (click)="cerrarConsentimiento()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="consent-box">
+          <p class="mb-0">{{ consentimientoTexto }}</p>
+        </div>
+        <div class="form-check mt-3">
+          <input class="form-check-input" type="checkbox" id="checkConsent" [(ngModel)]="consentimientoAceptado" [ngModelOptions]="{standalone: true}">
+          <label class="form-check-label small" for="checkConsent">He leído y acepto el consentimiento informado</label>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-outline-secondary rounded-3" (click)="cerrarConsentimiento()">Cancelar</button>
+        <button class="btn btn-primary rounded-3 px-4" (click)="aceptarConsentimiento()" [disabled]="!consentimientoAceptado">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showConsentimiento" *ngIf="showConsentimiento"></div>
+
+<!-- MODAL FIRMA -->
+<div class="modal fade" [class.show]="showFirmar" [style.display]="showFirmar ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Firma del Paciente</h5>
+        <button type="button" class="btn-close" (click)="cerrarFirmar()"></button>
+      </div>
+      <div class="modal-body">
+        <p class="small text-muted mb-2">Dibuje su firma dentro del recuadro con el mouse o dedo:</p>
+        <div class="firma-area">
+          <canvas #canvasFirma
+                  class="firma-canvas"
+                  width="460" height="160"
+                  (mousedown)="iniciarFirma($event)"
+                  (mousemove)="moverFirma($event)"
+                  (mouseup)="terminarFirma()"
+                  (mouseleave)="terminarFirma()"></canvas>
+          <span class="firma-line">Firma</span>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-outline-secondary rounded-3" (click)="limpiarFirma()">Limpiar</button>
+        <button class="btn btn-primary rounded-3 px-4" (click)="guardarFirma()">Guardar Firma</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showFirmar" *ngIf="showFirmar"></div>
+
+<!-- MODAL PAGO -->
+<div class="modal fade" [class.show]="showPago" [style.display]="showPago ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Pago a Realizar</h5>
+        <button type="button" class="btn-close" (click)="cerrarPago()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-sm-4">
+            <div class="pago-box pago-total">
+              <small class="pago-label">Total</small>
+              <p class="pago-valor">{{ pago.total ? 'S/ ' + pago.total : '—' }}</p>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="pago-box pago-adelanto">
+              <small class="pago-label">Adelanto</small>
+              <p class="pago-valor">{{ pago.adelanto ? 'S/ ' + pago.adelanto : '—' }}</p>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="pago-box pago-restante">
+              <small class="pago-label">Saldo</small>
+              <p class="pago-valor">{{ pago.restante ? 'S/ ' + pago.restante : '—' }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3 mt-3">
+          <label class="form-label fw-semibold text-muted small">Monto a pagar (S/)</label>
+          <input type="number" class="form-control rounded-3" [(ngModel)]="montoPago" [ngModelOptions]="{standalone: true}" placeholder="0.00">
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-outline-secondary rounded-3" (click)="cerrarPago()">Cancelar</button>
+        <button class="btn btn-success rounded-3 px-4" (click)="cerrarPago()">Registrar Pago</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showPago" *ngIf="showPago"></div>

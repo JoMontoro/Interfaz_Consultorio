@@ -135,3 +135,221 @@
   width: 48px;
   height: 48px;
 }
+
+/* ---- Ficha: cabeceras de sección ---- */
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.section-num {
+  min-width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #3B82F6, #1E3A8A);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.section-rule {
+  flex: 1;
+  height: 1px;
+  background: #E5E7EB;
+}
+
+/* ---- Motivo de consulta ---- */
+.motivo-box {
+  display: flex;
+  align-items: flex-start;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-left: 5px solid #3B82F6;
+  color: #1E3A8A;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 1rem;
+}
+
+/* ---- Odontograma ---- */
+.odontograma {
+  background: #F8FAFC;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  padding: 1.5rem 1rem;
+}
+
+.odonto-arch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.odonto-arch:last-child {
+  margin-bottom: 0;
+}
+
+.odonto-half {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.diente {
+  width: 40px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 12px 12px 14px 14px;
+  background: #fff;
+  color: #475569;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all .15s ease;
+  cursor: default;
+}
+
+.diente:hover {
+  border-color: #3B82F6;
+  color: #1E3A8A;
+  box-shadow: 0 2px 6px rgba(59,130,246,0.2);
+}
+
+.odonto-midline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.25rem;
+  color: #94A3B8;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  writing-mode: vertical-rl;
+  border-left: 1px dashed #CBD5E1;
+  border-right: 1px dashed #CBD5E1;
+  height: 52px;
+}
+
+.odonto-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 12px;
+  color: #64748B;
+}
+
+.odonto-leyenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.leyenda-chip {
+  width: 18px;
+  height: 12px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1.5px solid #CBD5E1;
+  display: inline-block;
+}
+
+.leyenda-chip.chip-caries { border-color: #EF4444; }
+.leyenda-chip.chip-obturado { border-color: #3B82F6; background: #3B82F6; }
+.leyenda-chip.chip-extraido { border-color: #64748B; }
+
+/* ---- Pago ---- */
+.pago-box {
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid #E5E7EB;
+  height: 100%;
+}
+
+.pago-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: #64748B;
+}
+
+.pago-valor {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+  margin-bottom: 0;
+}
+
+.pago-total   { background: #EFF6FF; border-color: #BFDBFE; color: #1E3A8A; }
+.pago-adelanto{ background: #FEF3C7; border-color: #FDE68A; color: #92400E; }
+.pago-restante{ background: #FEE2E2; border-color: #FECACA; color: #991B1B; }
+
+/* ---- Consentimiento ---- */
+.consent-box {
+  background: #F8FAFC;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 1.1rem 1.25rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+/* ---- Firma ---- */
+.firma-area {
+  position: relative;
+  border: 2px dashed #CBD5E1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.firma-canvas {
+  display: block;
+  width: 100%;
+  height: 160px;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.firma-line {
+  position: absolute;
+  bottom: 26px;
+  left: 30px;
+  right: 30px;
+  border-bottom: 1px solid #CBD5E1;
+  pointer-events: none;
+  text-align: center;
+  color: #94A3B8;
+  font-size: 12px;
+  padding-bottom: 4px;
+}
+
+/* ---- Edición motivo / antecedentes ---- */
+.motivo-edit {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-left: 5px solid #3B82F6;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+/* ---- Dientes con estados ---- */
+.d-caries   { border-color: #EF4444; background: #FEF2F2; color: #B91C1C; }
+.d-obturado { border-color: #3B82F6; background: #3B82F6; color: #fff; }
+.d-extraido { border-color: #64748B; background: #F1F5F9; color: #94A3B8; opacity: .7; }
+
+/* ---- Acciones finales (cierre de ficha) ---- */
+.ficha-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
