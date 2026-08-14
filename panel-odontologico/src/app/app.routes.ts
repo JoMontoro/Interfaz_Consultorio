@@ -29,6 +29,13 @@ export const routes: Routes = [
         .then(m => m.PACIENTES_ROUTES)
   },
   {
+    path: 'citas',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/citas/citas.routes')
+        .then(m => m.CITAS_ROUTES)
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
