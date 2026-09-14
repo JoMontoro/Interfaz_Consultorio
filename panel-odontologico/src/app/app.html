@@ -2,7 +2,7 @@
 
   <div class="sidebar-overlay" [class.active]="sidebarOpen" (click)="sidebarOpen = false"></div>
 
-  <aside class="sidebar" [class.open]="sidebarOpen">
+  <aside class="sidebar" [class.open]="sidebarOpen" [class.collapsed]="sidebarCollapsed">
     <div class="sidebar-brand">
       <div class="brand-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -12,8 +12,10 @@
         </svg>
       </div>
       <div class="brand-text">
-        <h1>Remodent</h1>
-        <p>Consultorio Odontológico</p>
+        <a href="/panel-principal">
+          <h1>Remodent</h1>
+          <p>Consultorio Odontológico</p>
+        </a>
       </div>
     </div>
 
@@ -47,20 +49,22 @@
   <main class="main-content">
     <header class="topbar">
       <div class="topbar-left">
-        <button class="btn-hamburger d-lg-none" (click)="sidebarOpen = !sidebarOpen">
+        <button class="btn-hamburger" (click)="toggleSidebar()" [attr.aria-expanded]="!sidebarCollapsed" aria-label="Mostrar u ocultar menú lateral">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <h1 class="page-title">Panel Odontológico</h1>
       </div>
       <div class="topbar-right">
         <div class="user-profile">
-          <div class="user-avatar">
-            @if (auth.fotoUrl(); as foto) {
-              <img [src]="foto" alt="Foto" class="avatar-img">
-            } @else {
-              <span>{{ auth.userProfile()?.nombre?.charAt(0) }}{{ auth.userProfile()?.apellido?.charAt(0) }}</span>
-            }
-          </div>
+          <a routerLink="/perfil" routerLinkActive="active" aria-label="Ver perfil">
+            <div class="user-avatar">
+              @if (auth.fotoUrl(); as foto) {
+                <img [src]="foto" alt="Foto de perfil" class="avatar-img">
+              } @else {
+                <span>{{ auth.userProfile()?.nombre?.charAt(0) }}{{ auth.userProfile()?.apellido?.charAt(0) }}</span>
+              }
+            </div>
+          </a>
           <div class="user-info">
             <span class="user-name">{{ titulo() }} {{ auth.userProfile()?.nombre }} {{ auth.userProfile()?.apellido }}</span>
             <span class="user-role">{{ rolGenero() }}</span>

@@ -8,6 +8,18 @@ import { PacienteService } from '../../../../core/services/paciente';
 
 export const TIPOS_CITA = ['CONSULTA', 'DIAGNOSTICO', 'TRATAMIENTO', 'CONTROL', 'EMERGENCIA'];
 export const ESTADOS_CITA = ['PROGRAMADA', 'CONFIRMADA', 'EN_ATENCION', 'FINALIZADA', 'CANCELADA', 'NO_ASISTIO'];
+export const TRATAMIENTOS_PROPUESTOS = [
+  'Limpieza dental',
+  'Profilaxis',
+  'Restauración con resina',
+  'Extracción dental',
+  'Endodoncia',
+  'Blanqueamiento dental',
+  'Aplicación de flúor',
+  'Ortodoncia',
+  'Prótesis dental',
+  'Control odontológico'
+];
 
 @Component({
   selector: 'app-listar-citas',
@@ -22,7 +34,6 @@ export class ListarCitas implements OnInit {
   filtroEstado = '';
   termino = '';
   pagina = 0;
-  size = 10;
   totalPages = 0;
 
   showModal = false;
@@ -32,9 +43,10 @@ export class ListarCitas implements OnInit {
 
   form: any = {};
 
-  pacientes: any[] = [];
+pacientes: any[] = [];
   casos: any[] = [];
   odontologos: any[] = [];
+  tratamientos: any[] = [];
 
   editarId!: number;
 
@@ -44,17 +56,21 @@ export class ListarCitas implements OnInit {
     this.cargarCitas();
     this.cargarPacientes();
     this.cargarOdontologos();
+    this.cargarTratamientos();
+  }
+
+  cargarTratamientos() {
+    this.service.listarTratamientos().subscribe({
+      next: (data) => { this.tratamientos = data || []; },
+      error: (err) => { console.error(err); }
+    });
   }
 
   cargarCitas() {
-    this.service.listar(this.pagina, this.size, this.termino, this.filtroEstado).subscribe({
+    this.service.listar(this.pagina, 1000, this.termino, this.filtroEstado).subscribe({
       next: (data) => {
-        this.Lista = data?.content || [];
-        this.totalPages = data?.totalPages || 0;
-        if (this.Lista.length === 0 && this.pagina > 0) {
-          this.pagina--;
-          this.cargarCitas();
-        }
+        this.Lista = Array.isArray(data) ? data : data?.content || [];
+        this.totalPages = Array.isArray(data) ? (this.Lista.length ? 1 : 0) : data?.totalPages || 0;
       },
       error: (err) => {
         console.error(err);
@@ -68,6 +84,13 @@ export class ListarCitas implements OnInit {
     this.cargarCitas();
   }
 
+  paginaAnterior() {
+    if (this.pagina > 0) {
+      this.pagina--;
+      this.cargarCitas();
+    }
+  }
+
   siguientePagina() {
     if (this.pagina < this.totalPages - 1) {
       this.pagina++;
@@ -75,11 +98,28 @@ export class ListarCitas implements OnInit {
     }
   }
 
-  paginaAnterior() {
-    if (this.pagina > 0) {
-      this.pagina--;
-      this.cargarCitas();
-    }
+  eliminarCita(id: number) {
+    Swal.fire({
+      title: '¿Eliminar cita?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#DC2626',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.service.eliminar(id).subscribe({
+        next: () => {
+          Swal.fire('Eliminada', 'Cita eliminada correctamente', 'success');
+          this.cargarCitas();
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire('Error', 'No se pudo eliminar la cita', 'error');
+        }
+      });
+    });
   }
 
   cargarPacientes() {
@@ -104,13 +144,15 @@ export class ListarCitas implements OnInit {
     });
   }
 
-  cargarCasos(pacienteId: number) {
+  cargarCasos(pacienteId: number, casoId?: number) {
     this.casos = [];
     this.form.casoClinicoId = null;
     if (!pacienteId) return;
     this.service.listarCasos(pacienteId).subscribe({
       next: (data) => {
         this.casos = data || [];
+        const casoSeleccionado = casoId || this.casos.find(c => c.estado !== 'CANCELADO')?.id;
+        this.form.casoClinicoId = casoSeleccionado || null;
       },
       error: (err) => {
         console.error(err);
@@ -118,30 +160,14 @@ export class ListarCitas implements OnInit {
     });
   }
 
-  eliminarCita(id: number) {
-    Swal.fire({
-      title: '¿Eliminar cita?',
-      text: 'El registro se eliminará de forma permanente de la base de datos',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#EF4444',
-      cancelButtonColor: '#6B7280',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Volver'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.service.eliminar(id).subscribe({
-          next: () => {
-            Swal.fire('Eliminada', 'Cita eliminada correctamente', 'success');
-            this.cargarCitas();
-          },
-          error: (err) => {
-            console.error(err);
-            const mensaje = err?.error?.mensaje || 'No se pudo eliminar la cita';
-            Swal.fire('Error', mensaje, 'error');
-          }
-        });
-      }
+  get citasFiltradas(): any[] {
+    return this.Lista.filter(c => {
+      const coincideEstado = !this.filtroEstado || c.estado === this.filtroEstado;
+      const coincideTermino = !this.termino ||
+        this.nombrePaciente(c).toLowerCase().includes(this.termino.toLowerCase()) ||
+        this.nombreTratamiento(c).toLowerCase().includes(this.termino.toLowerCase()) ||
+        this.nombreOdontologo(c).toLowerCase().includes(this.termino.toLowerCase());
+      return coincideEstado && coincideTermino;
     });
   }
 
@@ -150,6 +176,7 @@ export class ListarCitas implements OnInit {
       pacienteId: null,
       casoClinicoId: null,
       odontologoId: null,
+      tratamientoId: null,
       fecha: '',
       horaInicio: '',
       horaFin: '',
@@ -168,8 +195,8 @@ export class ListarCitas implements OnInit {
   }
 
   guardarCita() {
-    if (!this.form.pacienteId || !this.form.casoClinicoId || !this.form.odontologoId) {
-      Swal.fire('Faltan datos', 'Selecciona paciente, caso clínico y odontólogo', 'warning');
+    if (!this.form.pacienteId || !this.form.casoClinicoId || !this.form.odontologoId || !this.form.tratamientoId) {
+      Swal.fire('Faltan datos', 'Selecciona paciente, tratamiento y odontólogo. El paciente debe tener un caso clínico en su detalle.', 'warning');
       return;
     }
     this.service.crear(this.construirPayload()).subscribe({
@@ -191,8 +218,9 @@ export class ListarCitas implements OnInit {
       next: (cita) => {
         this.form = {
           pacienteId: cita.paciente?.id,
-          casoClinicoId: null,
+          casoClinicoId: cita.casoClinico?.id,
           odontologoId: cita.odontologo?.id,
+          tratamientoId: cita.tratamiento?.id || cita.tratamientoId || null,
           fecha: cita.fecha,
           horaInicio: (cita.horaInicio || '').slice(0, 5),
           horaFin: (cita.horaFin || '').slice(0, 5),
@@ -200,10 +228,7 @@ export class ListarCitas implements OnInit {
           estado: cita.estado || 'PROGRAMADA',
           observaciones: cita.observaciones || ''
         };
-        this.cargarCasos(cita.paciente?.id);
-        setTimeout(() => {
-          this.form.casoClinicoId = cita.casoClinico?.id;
-        }, 0);
+        this.cargarCasos(cita.paciente?.id, cita.casoClinico?.id);
         this.showEditModal = true;
       },
       error: (err) => {
@@ -219,9 +244,9 @@ export class ListarCitas implements OnInit {
     this.casos = [];
   }
 
-  actualizarCita() {
-    if (!this.form.casoClinicoId || !this.form.odontologoId) {
-      Swal.fire('Faltan datos', 'Selecciona caso clínico y odontólogo', 'warning');
+actualizarCita() {
+    if (!this.form.casoClinicoId || !this.form.odontologoId || !this.form.tratamientoId) {
+      Swal.fire('Faltan datos', 'Selecciona tratamiento y odontólogo. El paciente debe tener un caso clínico en su detalle.', 'warning');
       return;
     }
     this.service.actualizar(this.editarId, this.construirPayload()).subscribe({
@@ -278,6 +303,7 @@ export class ListarCitas implements OnInit {
       casoClinico: { id: this.form.casoClinicoId },
       paciente: { id: this.form.pacienteId },
       odontologo: { id: this.form.odontologoId },
+      tratamiento: this.form.tratamientoId ? { id: this.form.tratamientoId } : null,
       fecha: this.form.fecha,
       horaInicio: this.form.horaInicio,
       horaFin: this.form.horaFin,
@@ -295,8 +321,16 @@ export class ListarCitas implements OnInit {
     return cita?.odontologo ? `${cita.odontologo.nombre} ${cita.odontologo.apellido}`.trim() : '—';
   }
 
-  motivo(cita: any): string {
-    return cita?.casoClinico?.motivoConsulta || '—';
+  nombreTratamiento(cita: any): string {
+    const valor = cita?.tratamiento ?? cita?.tratamientoPropuesto;
+    if (typeof valor === 'string' && valor.trim()) return valor;
+    if (valor && typeof valor === 'object') {
+      return valor.nombre || valor.descripcion || valor.titulo || valor.nombreTratamiento || 'Sin tratamiento seleccionado';
+    }
+
+    const tratamientoId = cita?.tratamientoId;
+    const tratamiento = this.tratamientos.find(t => t.id === tratamientoId);
+    return tratamiento?.nombre || tratamiento?.descripcion || tratamiento?.titulo || 'Sin tratamiento seleccionado';
   }
 
   horaLabel(h: string): string {
@@ -306,8 +340,6 @@ export class ListarCitas implements OnInit {
   tipoLabel(tipo: string): string {
     const map: Record<string, string> = {
       CONSULTA: 'Consulta',
-      DIAGNOSTICO: 'Diagnóstico',
-      TRATAMIENTO: 'Tratamiento',
       CONTROL: 'Control',
       EMERGENCIA: 'Emergencia'
     };

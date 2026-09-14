@@ -50,4 +50,8 @@ export class CitaService {
   listarCasos(pacienteId: number) {
     return this.http.get<any[]>(`http://localhost:8088/api/pacientes/${pacienteId}/casos`, { headers: this.getAuthHeaders() });
   }
+
+  listarTratamientos() {
+    return this.http.get<any[]>('http://localhost:8088/api/tratamientos', { headers: this.getAuthHeaders() });
+  }
 }
