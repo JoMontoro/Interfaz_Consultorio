@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DashboardService, DashboardData } from '../../../core/services/dashboard';
 import { AuthService } from '../../../core/services/auth';
+import { CitaService } from '../../../core/services/cita';
 
 @Component({
   selector: 'app-panel-principal',
@@ -14,11 +15,13 @@ import { AuthService } from '../../../core/services/auth';
 export class PanelPrincipal implements OnInit {
 
   data: DashboardData | null = null;
+  totalCitas = 0;
   loading = true;
   fechaHoy = '';
 
   private dashboardService = inject(DashboardService);
   authService = inject(AuthService);
+  private citaService = inject(CitaService);
 
   ngOnInit(): void {
     this.fechaHoy = this.formatearFecha(new Date());
@@ -34,10 +37,22 @@ export class PanelPrincipal implements OnInit {
     this.dashboardService.obtenerDashboard().subscribe({
       next: (data) => {
         this.data = data;
+        this.cargarTotalCitas();
         this.loading = false;
       },
       error: () => {
         this.loading = false;
+      }
+    });
+  }
+
+  private cargarTotalCitas(): void {
+    this.citaService.listar(0, 1).subscribe({
+      next: (response: any) => {
+        this.totalCitas = response?.totalElements ?? response?.total ?? response?.content?.length ?? 0;
+      },
+      error: () => {
+        this.totalCitas = 0;
       }
     });
   }

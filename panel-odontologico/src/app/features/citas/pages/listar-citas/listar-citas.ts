@@ -100,23 +100,23 @@ pacientes: any[] = [];
 
   eliminarCita(id: number) {
     Swal.fire({
-      title: '¿Eliminar cita?',
-      text: 'Esta acción no se puede deshacer',
+      title: '¿Retirar cita?',
+      text: 'La cita se marcará como cancelada porque el sistema no permite borrar citas con registros relacionados.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#DC2626',
-      confirmButtonText: 'Sí, eliminar',
+      confirmButtonText: 'Sí, retirar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (!result.isConfirmed) return;
-      this.service.eliminar(id).subscribe({
+      this.service.cancelar(id).subscribe({
         next: () => {
-          Swal.fire('Eliminada', 'Cita eliminada correctamente', 'success');
+          Swal.fire('Cita retirada', 'La cita se marcó como cancelada correctamente', 'success');
           this.cargarCitas();
         },
         error: (err) => {
           console.error(err);
-          Swal.fire('Error', 'No se pudo eliminar la cita', 'error');
+          Swal.fire('Error', 'No se pudo retirar la cita', 'error');
         }
       });
     });
