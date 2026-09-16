@@ -171,6 +171,10 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M6.5 6a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5zM9.5 6a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z"/><path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zM4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/></svg>
           Firmar
         </button>
+        <button class="btn btn-success rounded-3 px-4" (click)="generarPresupuesto()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm10.5 6.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM2.5 4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 2 4h.5z"/></svg>
+          Generar presupuesto
+        </button>
         <button class="btn btn-outline-success rounded-3 px-4" (click)="abrirPago()">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M16 10c0-2-1.8-3-4-3s-4 1-4 3c0 2 1.8 3 4 3s4 1 4 3-1.8 3-4 3-4-1-4-3"/></svg>
           Pago
@@ -311,34 +315,49 @@
         <button type="button" class="btn-close" (click)="cerrarPago()"></button>
       </div>
       <div class="modal-body">
+        <div *ngIf="!pago.id" class="alert alert-warning rounded-3 small mb-3">
+          Este caso aún no tiene presupuesto. Genérelo a partir del plan de tratamiento (diagnósticos y tratamientos asignados).
+          <button class="btn btn-sm btn-primary rounded-3 px-3 mt-2" (click)="generarPresupuesto()">Generar presupuesto</button>
+        </div>
+        <div *ngIf="pago.id" class="text-end mb-2">
+          <span class="badge rounded-pill" [ngClass]="{
+            'text-bg-success': pago.estado === 'PAGADO',
+            'text-bg-primary': pago.estado === 'APROBADO',
+            'text-bg-warning': pago.estado === 'PENDIENTE',
+            'text-bg-danger': pago.estado === 'RECHAZADO'
+          }">{{ pago.estado }}</span>
+        </div>
         <div class="row g-3">
           <div class="col-sm-4">
             <div class="pago-box pago-total">
               <small class="pago-label">Total</small>
-              <p class="pago-valor">{{ pago.total ? 'S/ ' + pago.total : '—' }}</p>
+              <p class="pago-valor">{{ pago.total != null ? 'S/ ' + pago.total : '—' }}</p>
             </div>
           </div>
           <div class="col-sm-4">
             <div class="pago-box pago-adelanto">
-              <small class="pago-label">Adelanto</small>
-              <p class="pago-valor">{{ pago.adelanto ? 'S/ ' + pago.adelanto : '—' }}</p>
+              <small class="pago-label">Abonado</small>
+              <p class="pago-valor">{{ pago.adelanto != null ? 'S/ ' + pago.adelanto : '—' }}</p>
             </div>
           </div>
           <div class="col-sm-4">
             <div class="pago-box pago-restante">
               <small class="pago-label">Saldo</small>
-              <p class="pago-valor">{{ pago.restante ? 'S/ ' + pago.restante : '—' }}</p>
+              <p class="pago-valor">{{ pago.restante != null ? 'S/ ' + pago.restante : '—' }}</p>
             </div>
           </div>
         </div>
-        <div class="mb-3 mt-3">
+        <div class="mb-3 mt-3" *ngIf="pago.id && pago.estado !== 'PAGADO'">
           <label class="form-label fw-semibold text-muted small">Monto a pagar (S/)</label>
           <input type="number" class="form-control rounded-3" [(ngModel)]="montoPago" [ngModelOptions]="{standalone: true}" placeholder="0.00">
+        </div>
+        <div *ngIf="pago.estado === 'PAGADO'" class="alert alert-success rounded-3 small mb-0">
+          Este presupuesto está totalmente pagado.
         </div>
       </div>
       <div class="modal-footer border-0 pt-0">
         <button class="btn btn-outline-secondary rounded-3" (click)="cerrarPago()">Cancelar</button>
-        <button class="btn btn-success rounded-3 px-4" (click)="cerrarPago()">Registrar Pago</button>
+        <button class="btn btn-success rounded-3 px-4" (click)="registrarPago()" [disabled]="!pago.id || pago.estado === 'PAGADO' || !montoPago">Registrar Pago</button>
       </div>
     </div>
   </div>

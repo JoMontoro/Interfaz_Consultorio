@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { PacienteService } from '../../../../core/services/paciente';
 import { CasoClinicoService } from '../../../../core/services/caso-clinico';
 import { HistorialService } from '../../../../core/services/historial';
+import { PresupuestoService } from '../../../../core/services/presupuesto';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -52,7 +53,8 @@ export class DetallePaciente implements OnInit {
     private route: ActivatedRoute,
     private pacienteService: PacienteService,
     private casoClinicoService: CasoClinicoService,
-    private historialService: HistorialService
+    private historialService: HistorialService,
+    private presupuestoService: PresupuestoService
   ) {}
 
   // Modales
@@ -84,6 +86,61 @@ export class DetallePaciente implements OnInit {
     this.showPago = false;
   }
 
+  private aplicarPresupuesto(pre: any) {
+    this.pago = {
+      id: pre != null ? pre.id : null,
+      total: pre != null ? pre.total : null,
+      adelanto: pre != null ? pre.adelanto : null,
+      restante: pre != null ? pre.saldoPendiente : null,
+      estado: pre != null ? pre.estado : null
+    };
+  }
+
+  generarPresupuesto() {
+    const caso = this.casoActivo;
+    if (!caso) {
+      Swal.fire('Sin caso', 'Primero cree un caso clínico para el paciente', 'info');
+      return;
+    }
+    this.presupuestoService.generar(caso.id, 0).subscribe({
+      next: (res: any) => {
+        this.aplicarPresupuesto(res);
+        this.pago.casoId = caso.id;
+        Swal.fire('Presupuesto generado', 'Calculado a partir del plan de tratamiento del caso', 'success')
+          .then(() => this.abrirPago());
+      },
+      error: () => Swal.fire('Error', 'No se pudo generar el presupuesto', 'error')
+    });
+  }
+
+  registrarPago() {
+    const monto = Number(this.montoPago);
+    if (!this.pago.id) {
+      Swal.fire('Aviso', 'Primero genere un presupuesto para este caso', 'warning');
+      return;
+    }
+    if (!monto || monto <= 0) {
+      Swal.fire('Aviso', 'Ingrese un monto válido mayor a 0', 'warning');
+      return;
+    }
+    if (monto > this.pago.restante) {
+      Swal.fire('Aviso', 'El monto supera el saldo pendiente (S/ ' + this.pago.restante + ')', 'warning');
+      return;
+    }
+    this.presupuestoService.registrarPago(this.pago.id, monto).subscribe({
+      next: (res: any) => {
+        this.aplicarPresupuesto(res);
+        this.pago.casoId = this.casoActivo?.id;
+        this.cerrarPago();
+        Swal.fire('Pago registrado', 'El saldo pendiente ahora es S/ ' + this.pago.restante, 'success');
+      },
+      error: (err: any) => {
+        const msg = err?.error?.message || 'No se pudo registrar el pago';
+        Swal.fire('Error', msg, 'error');
+      }
+    });
+  }
+
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (id) {
@@ -113,12 +170,7 @@ export class DetallePaciente implements OnInit {
           enfermedades: this.historial.enfermedades || '',
           observacionesGenerales: this.historial.observacionesGenerales || ''
         };
-        const presupuesto = data.presupuesto || {};
-        this.pago = {
-          total: presupuesto.total || null,
-          adelanto: presupuesto.adelanto || null,
-          restante: presupuesto.restante || null
-        };
+        this.aplicarPresupuesto(data.presupuesto || null);
         this.loading = false;
       },
       error: (err: any) => {
@@ -133,8 +185,14 @@ export class DetallePaciente implements OnInit {
       next: (data) => {
         this.casos = data;
         this.motivoForm = this.motivoConsulta;
-        if (!this.pago.restante && this.casoActivo && this.casoActivo.saldoPendiente) {
-          this.pago.restante = this.casoActivo.saldoPendiente;
+        if (this.casoActivo) {
+          this.pago.casoId = this.casoActivo.id;
+          if (!this.pago.id && this.casoActivo.presupuestoId) {
+            this.pago.id = this.casoActivo.presupuestoId;
+          }
+          if (!this.pago.restante && this.casoActivo.saldoPendiente) {
+            this.pago.restante = this.casoActivo.saldoPendiente;
+          }
         }
       },
       error: () => this.casos = []
