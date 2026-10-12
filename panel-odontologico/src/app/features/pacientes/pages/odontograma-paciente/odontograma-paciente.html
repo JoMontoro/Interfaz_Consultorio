@@ -1,0 +1,298 @@
+<div class="container-fluid px-4 py-4">
+
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="/pacientes">Pacientes</a></li>
+      <li class="breadcrumb-item"><a [routerLink]="['/pacientes/detalle', pacienteId]">{{ paciente.nombre }} {{ paciente.apellido }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Odontograma</li>
+    </ol>
+  </nav>
+
+  <ng-container *ngIf="!loading; else cargando">
+
+    <!-- ============ CABECERA ============ -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between bg-white rounded-4 p-4 shadow-sm mb-4">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-avatar">{{ iniciales() }}</div>
+        <div>
+          <h4 class="mb-1 fw-bold text-dark">Odontograma — {{ paciente.nombre }} {{ paciente.apellido }}</h4>
+          <div class="d-flex flex-wrap gap-3 small text-muted">
+            <span><span class="fw-semibold text-dark">DNI:</span> {{ paciente.dni || '-' }}</span>
+            <span><span class="fw-semibold text-dark">Dentición:</span> {{ etiquetaDentadura }}</span>
+            <span *ngIf="editandoId !== null" class="text-warning fw-semibold">Editando un registro existente</span>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2 mt-2 mt-sm-0">
+        <a class="btn btn-outline-secondary rounded-3 px-4" [routerLink]="['/pacientes/detalle', pacienteId]">
+          Volver a la ficha
+        </a>
+        <button class="btn btn-outline-primary rounded-3 px-4" (click)="nuevo()" [disabled]="soloLectura">
+          Nuevo odontograma
+        </button>
+      </div>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- ================= FORMULARIO ================= -->
+      <div class="col-lg-8">
+
+        <!-- 1. ODONTOGRAMA -->
+        <div class="card odonto-card mb-4">
+          <div class="section-head">
+            <span class="section-num">1</span>
+            <h5 class="section-title mb-0">Odontograma</h5>
+            <span class="section-rule"></span>
+          </div>
+
+          <!-- Selector adulto / niño -->
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <div class="btn-group selector-dentadura" role="group" aria-label="Tipo de dentición">
+              <button type="button" class="btn btn-sm rounded-start-3"
+                      [class.btn-primary]="tipoDentadura === 'ADULTO'"
+                      [class.btn-outline-primary]="tipoDentadura !== 'ADULTO'"
+                      (click)="cambiarDentadura('ADULTO')">Adulto (permanentes)</button>
+              <button type="button" class="btn btn-sm rounded-end-3"
+                      [class.btn-primary]="tipoDentadura === 'NINO'"
+                      [class.btn-outline-primary]="tipoDentadura !== 'NINO'"
+                      (click)="cambiarDentadura('NINO')">Niño (leche)</button>
+            </div>
+            <small class="text-muted">
+              Notación FDI:
+              <span *ngIf="tipoDentadura === 'ADULTO'">dientes 18–28 y 38–41</span>
+              <span *ngIf="tipoDentadura === 'NINO'">dientes 55–65 y 85–71</span>
+              · dientes marcados: <span class="fw-semibold text-dark">{{ dientesMarcados.length }}</span>
+            </small>
+          </div>
+
+          <!-- Arcos dentales -->
+          <div class="odontograma">
+            <div class="odonto-arch">
+              <div class="odonto-half">
+                <button type="button" class="diente" *ngFor="let d of arcoSuperiorIzq"
+                        [class.activo]="dienteActivo === d"
+                        [class.marcado]="condicionesDe(d).length > 0"
+                        [class.d-ausente]="condicionesDe(d).includes('AUSENTE')"
+                        [style.border-color]="colorDiente(d) || ''"
+                        [style.background]="condicionesDe(d).length ? (colorDiente(d) + '1A') : ''"
+                        [title]="tituloDiente(d)"
+                        (click)="seleccionarDiente(d)">
+                  <span class="diente-num">{{ d }}</span>
+                  <span class="diente-puntos" *ngIf="condicionesDe(d).length">
+                    <i *ngFor="let c of condicionesDe(d).slice(0, 3)" [style.background]="colorDe(c)"></i>
+                    <em *ngIf="condicionesDe(d).length > 3">+{{ condicionesDe(d).length - 3 }}</em>
+                  </span>
+                </button>
+              </div>
+              <div class="odonto-midline"><span>Línea Media</span></div>
+              <div class="odonto-half">
+                <button type="button" class="diente" *ngFor="let d of arcoSuperiorDer"
+                        [class.activo]="dienteActivo === d"
+                        [class.marcado]="condicionesDe(d).length > 0"
+                        [class.d-ausente]="condicionesDe(d).includes('AUSENTE')"
+                        [style.border-color]="colorDiente(d) || ''"
+                        [style.background]="condicionesDe(d).length ? (colorDiente(d) + '1A') : ''"
+                        [title]="tituloDiente(d)"
+                        (click)="seleccionarDiente(d)">
+                  <span class="diente-num">{{ d }}</span>
+                  <span class="diente-puntos" *ngIf="condicionesDe(d).length">
+                    <i *ngFor="let c of condicionesDe(d).slice(0, 3)" [style.background]="colorDe(c)"></i>
+                    <em *ngIf="condicionesDe(d).length > 3">+{{ condicionesDe(d).length - 3 }}</em>
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div class="odonto-arch">
+              <div class="odonto-half">
+                <button type="button" class="diente diente-inferior" *ngFor="let d of arcoInferiorIzq"
+                        [class.activo]="dienteActivo === d"
+                        [class.marcado]="condicionesDe(d).length > 0"
+                        [class.d-ausente]="condicionesDe(d).includes('AUSENTE')"
+                        [style.border-color]="colorDiente(d) || ''"
+                        [style.background]="condicionesDe(d).length ? (colorDiente(d) + '1A') : ''"
+                        [title]="tituloDiente(d)"
+                        (click)="seleccionarDiente(d)">
+                  <span class="diente-num">{{ d }}</span>
+                  <span class="diente-puntos" *ngIf="condicionesDe(d).length">
+                    <i *ngFor="let c of condicionesDe(d).slice(0, 3)" [style.background]="colorDe(c)"></i>
+                    <em *ngIf="condicionesDe(d).length > 3">+{{ condicionesDe(d).length - 3 }}</em>
+                  </span>
+                </button>
+              </div>
+              <div class="odonto-midline"><span>Línea Media</span></div>
+              <div class="odonto-half">
+                <button type="button" class="diente diente-inferior" *ngFor="let d of arcoInferiorDer"
+                        [class.activo]="dienteActivo === d"
+                        [class.marcado]="condicionesDe(d).length > 0"
+                        [class.d-ausente]="condicionesDe(d).includes('AUSENTE')"
+                        [style.border-color]="colorDiente(d) || ''"
+                        [style.background]="condicionesDe(d).length ? (colorDiente(d) + '1A') : ''"
+                        [title]="tituloDiente(d)"
+                        (click)="seleccionarDiente(d)">
+                  <span class="diente-num">{{ d }}</span>
+                  <span class="diente-puntos" *ngIf="condicionesDe(d).length">
+                    <i *ngFor="let c of condicionesDe(d).slice(0, 3)" [style.background]="colorDe(c)"></i>
+                    <em *ngIf="condicionesDe(d).length > 3">+{{ condicionesDe(d).length - 3 }}</em>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leyenda -->
+          <div class="odonto-leyenda mt-3">
+            <span class="odonto-leyenda-item" *ngFor="let c of CONDICIONES">
+              <span class="leyenda-chip" [style.background]="c.color" [style.border-color]="c.color"></span> {{ c.label }}
+            </span>
+          </div>
+
+          <!-- Panel de malestares del diente seleccionado -->
+          <div class="diente-panel mt-3" *ngIf="dienteActivo !== null">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+              <div>
+                <span class="diente-panel-num">{{ dienteActivo }}</span>
+                <span class="fw-semibold text-dark ms-2">Malestares del diente</span>
+                <small class="text-muted ms-2"> Seleccione todos los que apliquen</small>
+              </div>
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 px-3"
+                        (click)="limpiarDiente()" [disabled]="soloLectura || !condicionesDe(dienteActivo).length">
+                  Limpiar diente
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-3 px-3"
+                        (click)="dienteActivo = null">Cerrar</button>
+              </div>
+            </div>
+            <div class="cond-grid">
+              <button type="button" class="cond-chip" *ngFor="let c of CONDICIONES"
+                      [class.on]="tieneCondicion(c.codigo)"
+                      [style.--c]="c.color"
+                      [disabled]="soloLectura"
+                      (click)="alternarCondicion(c.codigo)">
+                <span class="cond-dot" [style.background]="c.color"></span>
+                {{ c.label }}
+              </button>
+            </div>
+          </div>
+
+          <p class="small text-muted mt-3 mb-0" *ngIf="dienteActivo === null">
+            Haga clic sobre un diente del odontograma para registrar sus malestares.
+          </p>
+        </div>
+
+        <!-- 2. TEJIDOS BLANDOS -->
+        <div class="card odonto-card mb-4">
+          <div class="section-head">
+            <span class="section-num">2</span>
+            <h5 class="section-title mb-0">Tejidos Blandos</h5>
+            <span class="section-rule"></span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead>
+                <tr class="small text-muted">
+                  <th>Zona</th>
+                  <th class="col-estado">Estado</th>
+                  <th>Observación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let t of tejidos">
+                  <td class="fw-semibold small text-nowrap">{{ t.zona }}</td>
+                  <td class="col-estado">
+                    <select class="form-select form-select-sm rounded-3" [(ngModel)]="t.estado"
+                            [disabled]="soloLectura">
+                      <option value="">Sin valoración</option>
+                      <option *ngFor="let e of ESTADOS_TEJIDO" [value]="e.valor">{{ e.etiqueta }}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control form-control-sm rounded-3"
+                           [(ngModel)]="t.observacion" [disabled]="soloLectura"
+                           placeholder="Observación (opcional)">
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. OTROS -->
+        <div class="card odonto-card mb-4">
+          <div class="section-head">
+            <span class="section-num">3</span>
+            <h5 class="section-title mb-0">Otros</h5>
+            <span class="section-rule"></span>
+          </div>
+          <small class="info-label">Evaluación del odontólogo</small>
+          <textarea class="form-control rounded-3 mt-2" rows="4" [(ngModel)]="observaciones"
+                    [disabled]="soloLectura"
+                    placeholder="Escriba aquí cualquier otro hallazgo, diagnóstico o indicación para el paciente..."></textarea>
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+            <small class="text-muted">
+              El registro queda guardado en la base de datos y aparece en el historial de la derecha.
+            </small>
+            <button class="btn btn-primary rounded-3 px-5 fw-semibold" (click)="guardar()"
+                    [disabled]="guardando || soloLectura">
+              <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
+              {{ editandoId !== null ? 'Actualizar odontograma' : 'Guardar odontograma' }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ================= HISTORIAL ================= -->
+      <div class="col-lg-4">
+        <div class="card odonto-card">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="fw-bold mb-0">Historial de odontogramas</h6>
+            <span class="badge rounded-pill bg-primary-subtle text-primary">{{ historial.length }}</span>
+          </div>
+
+          <div *ngIf="historial.length === 0" class="hist-vacio">
+            Este paciente aún no tiene odontogramas registrados.
+          </div>
+
+          <div class="hist-item" *ngFor="let od of historial" [class.activo]="editandoId === od.id">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <div>
+                <span class="fw-semibold small">{{ fechaCorta(od.fechaRegistro) }}</span>
+                <small class="text-muted ms-1">{{ horaCorta(od.fechaRegistro) }}</small>
+              </div>
+              <span class="badge rounded-pill"
+                    [ngClass]="od.tipoDentadura === 'ADULTO' ? 'text-bg-primary' : 'text-bg-info'">
+                {{ od.tipoDentadura === 'ADULTO' ? 'Adulto' : 'Niño' }}
+              </span>
+            </div>
+            <small class="text-muted d-block">
+              {{ od.odontologoNombre || 'Odontólogo' }} ·
+              {{ (od.dientes || []).length }} diente(s) con malestares
+            </small>
+            <small class="text-truncate d-block text-muted" *ngIf="od.observaciones">
+              “{{ od.observaciones }}”
+            </small>
+            <div class="hist-btns" *ngIf="!soloLectura">
+              <button type="button" class="btn btn-sm btn-outline-primary rounded-3 px-3"
+                      (click)="cargar(od)">Editar</button>
+              <button type="button" class="btn btn-sm btn-outline-danger rounded-3 px-3"
+                      (click)="eliminar(od)">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <ng-template #cargando>
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+    </div>
+  </ng-template>
+
+</div>

@@ -24,5 +24,11 @@ export const PACIENTES_ROUTES: Routes = [
     loadComponent: () =>
       import('./pages/paciente-detalle/paciente-detalle')
         .then(m => m.DetallePaciente)
+  },
+  {
+    path: 'odontograma/:id',
+    loadComponent: () =>
+      import('./pages/odontograma-paciente/odontograma-paciente')
+        .then(m => m.OdontogramaPaciente)
   }
 ];

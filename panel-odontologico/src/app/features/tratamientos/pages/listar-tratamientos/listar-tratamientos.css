@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  min-height: 100%;
+  background: #ECEEF0;
+}
+
+.table > thead > tr > th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6B7280;
+  font-weight: 600;
+}
+
+.table > tbody > tr > td {
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.opacidad-inactiva td {
+  opacity: 0.6;
+}
+
+.btn-outline-primary:hover svg,
+.btn-outline-success:hover svg,
+.btn-outline-warning:hover svg,
+.btn-outline-danger:hover svg {
+  stroke: #fff;
+}
+
+.btn-outline-primary:hover {
+  background-color: #3B82F6;
+  color: #fff;
+}
+
+.btn-outline-success:hover {
+  background-color: #10B981;
+  color: #fff;
+}
+
+.btn-outline-warning:hover {
+  background-color: #F59E0B;
+  color: #fff;
+}
+
+.btn-outline-danger:hover {
+  background-color: #EF4444;
+  color: #fff;
+}

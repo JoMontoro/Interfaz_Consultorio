@@ -36,6 +36,13 @@ export const routes: Routes = [
         .then(m => m.CITAS_ROUTES)
   },
   {
+    path: 'tratamientos',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/tratamientos/tratamientos.routes')
+        .then(m => m.TRATAMIENTOS_ROUTES)
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'

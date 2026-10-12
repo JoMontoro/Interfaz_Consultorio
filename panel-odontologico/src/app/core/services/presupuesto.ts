@@ -34,6 +34,27 @@ export class PresupuestoService {
     });
   }
 
+  /** Aplica un descuento: el total a cobrar baja en la misma medida. */
+  actualizarDescuento(presupuestoId: number, descuento: number) {
+    return this.http.put<any>(`${this.apiUrl}/${presupuestoId}/descuento`, { descuento }, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  /** Fija el monto total a cobrar al paciente, editando el presupuesto. */
+  actualizarMonto(presupuestoId: number, monto: number) {
+    return this.http.put<any>(`${this.apiUrl}/${presupuestoId}/monto`, { monto }, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  /** Vuelve al total calculado a partir de los precios del plan. */
+  quitarMontoPersonalizado(presupuestoId: number) {
+    return this.http.delete<any>(`${this.apiUrl}/${presupuestoId}/monto`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   registrarPago(presupuestoId: number, monto: number) {
     return this.http.post<any>(`${this.apiUrl}/${presupuestoId}/pagos`, { monto }, {
       headers: this.getAuthHeaders()

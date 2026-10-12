@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PacienteService } from '../../../../core/services/paciente';
+import { CasoClinicoService } from '../../../../core/services/caso-clinico';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,16 +17,19 @@ export class ListarPacientes implements OnInit {
 
   Lista: any[] = [];
   pagina=0;
-  size =10;
+  size =100;
   totalPages = 0;
+  totalRegistros = 0;
   showModal = false;
   showEditModal = false;
   mostrarOcultos = false;
+  soloPendientes = false;
   nuevoPaciente: any = {};
+  motivoConsultaNuevo = '';
   editarPaciente: any = {};
   editarId!: number;
 
-  constructor(private service: PacienteService) {}
+  constructor(private service: PacienteService, private casoService: CasoClinicoService) {}
 
   ngOnInit(): void {
     this.cargarPacientes();
@@ -37,24 +41,41 @@ export class ListarPacientes implements OnInit {
     this.cargarPacientes();
   }
 
+  /**
+   * Filtro opcional: por defecto se ven TODOS los pacientes, incluidos los que ya
+   * pagaron su presupuesto o finalizaron el caso. Activarlo deja fuera solo a
+   * los atendidos, sin borrarlos nunca del sistema.
+   */
+  togglePendientes() {
+    this.soloPendientes = !this.soloPendientes;
+    this.pagina = 0;
+    this.cargarPacientes();
+  }
+
+  esAtendido(p: any): boolean {
+    return p?.estadoAtencion === 'ATENDIDO';
+  }
+
   cargarPacientes() {
     this.service
       .listarPaginado(
         this.pagina,
         this.size,
-        this.mostrarOcultos ? undefined : true
+        this.mostrarOcultos ? undefined : true,
+        !this.soloPendientes
       )
       .subscribe({
 
         next: (data: any) => {
-
-          console.log(data);
 
           this.Lista =
             data.content;
 
           this.totalPages =
             data.totalPages;
+
+          this.totalRegistros =
+            data.totalElements;
 
         },
 
@@ -105,14 +126,37 @@ export class ListarPacientes implements OnInit {
   cerrarModal() {
     this.showModal = false;
     this.nuevoPaciente = {};
+    this.motivoConsultaNuevo = '';
   }
 
+  /**
+   * Registra al paciente y, si escribio el motivo de consulta, crea el caso
+   * clinico de una vez: asi el plan de tratamiento se puede generar de inmediato.
+   */
   guardarPaciente() {
+    const motivo = (this.motivoConsultaNuevo || '').trim();
     this.service.crear(this.nuevoPaciente).subscribe({
-      next: () => {
-        Swal.fire('Creado', 'Paciente registrado correctamente', 'success');
-        this.cerrarModal();
-        this.cargarPacientes();
+      next: (creado: any) => {
+        if (!motivo || !creado?.id) {
+          Swal.fire('Creado', 'Paciente registrado correctamente', 'success');
+          this.cerrarModal();
+          this.cargarPacientes();
+          return;
+        }
+        this.casoService.crear(creado.id, { motivoConsulta: motivo }).subscribe({
+          next: () => {
+            Swal.fire('Paciente y caso creados',
+              'Ya puede generar el plan de tratamiento desde la ficha', 'success');
+            this.cerrarModal();
+            this.cargarPacientes();
+          },
+          error: () => {
+            Swal.fire('Paciente creado',
+              'No se pudo crear el caso clínico;Puede agregarlo desde la ficha del paciente', 'warning');
+            this.cerrarModal();
+            this.cargarPacientes();
+          }
+        });
       },
       error: (err) => {
         console.error(err);
@@ -194,26 +238,30 @@ export class ListarPacientes implements OnInit {
     });
   }
 
-  eliminar(id: number) {
+  /**
+   * Oculta al paciente de la lista activa. Nunca borra: la ficha clinica y su
+   * presupuesto se conservan, y reaparece con el filtro "Mostrar ocultos".
+   */
+  desactivar(id: number) {
     Swal.fire({
-      title: '¿Desactivar paciente?',
-      text: 'El paciente quedará oculto de la lista',
+      title: '¿Ocultar paciente?',
+      text: 'El paciente se ocultará de la lista. Su información no se elimina y se conserva para posibles consultas.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#EF4444',
       cancelButtonColor: '#6B7280',
-      confirmButtonText: 'Sí, desactivar',
+      confirmButtonText: 'Sí, ocultar',
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.service.eliminar(id).subscribe({
+        this.service.desactivar(id).subscribe({
           next: () => {
-            Swal.fire('Desactivado', 'Paciente desactivado correctamente', 'success');
+            Swal.fire('Ocultado', 'El paciente se ocultó de la lista. Su información se conserva para posibles consultas.', 'success');
             this.cargarPacientes();
           },
           error: (err: any) => {
             console.error(err);
-            Swal.fire('Error', 'No se pudo desactivar el paciente', 'error');
+            Swal.fire('Error', 'No se pudo ocultar el paciente', 'error');
           }
         });
       }

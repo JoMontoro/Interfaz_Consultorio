@@ -16,8 +16,12 @@ export class PacienteService {
     return this.auth.getAuthHeaders();
   }
 
-  listarPaginado(page: number, size: number, estado?: boolean) {
-    let url = `${this.apiUrl}?page=${page}&size=${size}`;
+  /**
+   * mostrarAtendidos=true (por defecto) mantiene en el listado a los pacientes con
+   * presupuesto pagado / caso finalizado; false los excluye de la tabla.
+   */
+  listarPaginado(page: number, size: number, estado?: boolean, mostrarAtendidos = true) {
+    let url = `${this.apiUrl}?page=${page}&size=${size}&mostrarAtendidos=${mostrarAtendidos}`;
     if (estado !== undefined) url += `&estado=${estado}`;
     return this.http.get<any[]>(url, { headers: this.getAuthHeaders() });
   }
@@ -34,10 +38,12 @@ export class PacienteService {
     return this.http.put(`${this.apiUrl}/${id}`, paciente, { headers: this.getAuthHeaders() });
   }
 
-  eliminar(id: number) {
+  /** Oculta al paciente de la lista activa. No borra nada: la ficha se conserva. */
+  desactivar(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getAuthHeaders() });
   }
 
+  /** Vuelve a mostrar un paciente desactivado en la lista. */
   reactivar(id: number) {
     return this.http.put(`${this.apiUrl}/${id}/reactivar`, {}, { headers: this.getAuthHeaders() });
   }

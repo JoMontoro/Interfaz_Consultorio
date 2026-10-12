@@ -28,13 +28,13 @@ export class CasoClinicoService {
     });
   }
 
-  crear(pacienteId: number, data: { motivoConsulta: string }) {
+  crear(pacienteId: number, data: { motivoConsulta?: string; diagnostico?: string }) {
     return this.http.post<any>(`${this.apiUrl}/pacientes/${pacienteId}/casos`, data, {
       headers: this.getAuthHeaders()
     });
   }
 
-  actualizar(id: number, data: { motivoConsulta?: string; estado?: string }) {
+  actualizar(id: number, data: { motivoConsulta?: string; estado?: string; diagnostico?: string }) {
     return this.http.put<any>(`${this.apiUrl}/casos/${id}`, data, {
       headers: this.getAuthHeaders()
     });

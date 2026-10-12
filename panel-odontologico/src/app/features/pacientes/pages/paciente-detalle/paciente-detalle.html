@@ -17,9 +17,9 @@
         <div>
           <h4 class="mb-1 fw-bold text-dark">{{ paciente.nombre }} {{ paciente.apellido }}</h4>
           <div class="d-flex flex-wrap gap-3 small text-muted">
-            <span><span class="fw-semibold text-dark">DNI:</span> {{ paciente.dni || '—' }}</span>
-            <span><span class="fw-semibold text-dark">Tel:</span> {{ paciente.telefono || '—' }}</span>
-            <span><span class="fw-semibold text-dark">Email:</span> {{ paciente.email || '—' }}</span>
+            <span><span class="fw-semibold text-dark">DNI:</span> {{ paciente.dni || '-' }}</span>
+            <span><span class="fw-semibold text-dark">Tel:</span> {{ paciente.telefono || '-' }}</span>
+            <span><span class="fw-semibold text-dark">Email:</span> {{ paciente.email || '-' }}</span>
           </div>
         </div>
       </div>
@@ -29,7 +29,7 @@
       </button>
     </div>
 
-    <!-- ============ FICHA CLÍNICA ============ -->
+    <!-- ============ FICHA CLé2NICA ============ -->
     <div class="ficha">
 
       <!-- 1. ANAMNESIS -->
@@ -52,7 +52,7 @@
           ]">
             <div>
               <small class="info-label">{{ f.label }}</small>
-              <p class="info-value">{{ f.val || '—' }}</p>
+              <p class="info-value">{{ f.val || '-' }}</p>
             </div>
           </div>
         </div>
@@ -65,10 +65,31 @@
           <h5 class="section-title mb-0">Motivo de Consulta</h5>
           <span class="section-rule"></span>
         </div>
-        <div class="motivo-edit">
-          <textarea class="form-control rounded-3" rows="3" [(ngModel)]="motivoForm" [ngModelOptions]="{standalone: true}" placeholder="Describa el motivo de consulta..."></textarea>
-          <div class="text-end mt-2">
-            <button class="btn btn-sm btn-primary rounded-3 px-3" (click)="guardarMotivo()">{{ casoActivo ? 'Guardar motivo' : 'Agregar motivo' }}</button>
+        <div class="row g-3">
+          <div class="col-12 col-lg-6">
+            <small class="info-label">Motivo de consulta</small>
+            <textarea class="form-control rounded-3" rows="3" [(ngModel)]="motivoForm" [ngModelOptions]="{standalone: true}"
+                      placeholder="Describa el motivo de consulta..."></textarea>
+          </div>
+          <div class="col-12 col-lg-6">
+            <small class="info-label">Diagnostico clinico</small>
+            <textarea class="form-control rounded-3" rows="3" [(ngModel)]="diagnosticoForm" [ngModelOptions]="{standalone: true}"
+                      placeholder="Ej. Caries en molar 36 con dolor a la masticacion. Sarro generalizado."></textarea>
+          </div>
+        </div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
+          <small class="text-muted">
+            Del diagnóstico sale el plan de tratamiento, y del plan el presupuesto. Todo editable.
+          </small>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary rounded-3 px-3" (click)="guardarConsulta()"
+                    [disabled]="soloLectura">
+              {{ casoActivo ? 'Guardar' : 'Agregar motivo' }}
+            </button>
+            <button *ngIf="casoActivo && !soloLectura" class="btn btn-sm btn-success rounded-3 px-3"
+                    (click)="generarPlanDesdeDiagnostico(false)" [disabled]="generandoPlan">
+              Generar plan
+            </button>
           </div>
         </div>
       </div>
@@ -103,58 +124,144 @@
         </div>
       </div>
 
-      <!-- 4. ODONTOGRAMA -->
+      <!-- 4. ODONTOGRAMA Y TEJIDOS BLANDOS -->
       <div class="card info-card mb-4">
         <div class="section-head">
           <span class="section-num">4</span>
-          <h5 class="section-title mb-0">Odontograma</h5>
+          <h5 class="section-title mb-0">Odontograma y Tejidos Blandos</h5>
           <span class="section-rule"></span>
         </div>
-        <div class="odontograma">
-          <div class="odonto-arch">
-            <div class="odonto-half">
-              <span class="diente" [class.d-caries]="estadoDiente(d)==='caries'" [class.d-obturado]="estadoDiente(d)==='obturado'" [class.d-extraido]="estadoDiente(d)==='extraido'" *ngFor="let d of arcoSuperiorIzq" (click)="ciclarDiente(d)" title="Clic para cambiar el estado">{{ d }}</span>
-            </div>
-            <div class="odonto-midline"><span>Línea Media</span></div>
-            <div class="odonto-half">
-              <span class="diente" [class.d-caries]="estadoDiente(d)==='caries'" [class.d-obturado]="estadoDiente(d)==='obturado'" [class.d-extraido]="estadoDiente(d)==='extraido'" *ngFor="let d of arcoSuperiorDer" (click)="ciclarDiente(d)" title="Clic para cambiar el estado">{{ d }}</span>
-            </div>
-          </div>
-          <div class="odonto-arch">
-            <div class="odonto-half">
-              <span class="diente" [class.d-caries]="estadoDiente(d)==='caries'" [class.d-obturado]="estadoDiente(d)==='obturado'" [class.d-extraido]="estadoDiente(d)==='extraido'" *ngFor="let d of arcoInferiorIzq" (click)="ciclarDiente(d)" title="Clic para cambiar el estado">{{ d }}</span>
-            </div>
-            <div class="odonto-midline"><span>Línea Media</span></div>
-            <div class="odonto-half">
-              <span class="diente" [class.d-caries]="estadoDiente(d)==='caries'" [class.d-obturado]="estadoDiente(d)==='obturado'" [class.d-extraido]="estadoDiente(d)==='extraido'" *ngFor="let d of arcoInferiorDer" (click)="ciclarDiente(d)" title="Clic para cambiar el estado">{{ d }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="odonto-leyenda mt-3">
-          <span class="odonto-leyenda-item"><span class="leyenda-chip"></span> Sano</span>
-          <span class="odonto-leyenda-item"><span class="leyenda-chip chip-caries"></span> Caries</span>
-          <span class="odonto-leyenda-item"><span class="leyenda-chip chip-obturado"></span> Obturado</span>
-          <span class="odonto-leyenda-item"><span class="leyenda-chip chip-extraido"></span> Extraído</span>
-          <span class="text-muted ms-auto small">Clic sobre cada diente para cambiar su estado</span>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <p class="text-muted small mb-0" style="max-width: 640px;">
+            Registre la evaluación completa del paciente: dentición <strong>adulta o infantil</strong>,
+            malestares por diente, valoración de los <strong>tejidos blandos</strong> y el cuadro
+            <strong>"Otros"</strong> con su evaluación. Todo queda guardado en la base de datos
+            y disponible en el historial del paciente.
+          </p>
+          <a class="btn btn-primary rounded-3 px-4 fw-semibold"
+             [routerLink]="['/pacientes/odontograma', paciente.id]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.646-1.647a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.176-.032l-.178.178a.5.5 0 0 0-.14.5l.082.23a.25.25 0 0 0 .242.174h.01a.25.25 0 0 0 .219-.151l.187-.286a.5.5 0 0 1 .093-.14l.002-.003z"/></svg>
+            Abrir odontograma
+          </a>
         </div>
       </div>
 
-      <!-- 5. TEJIDOS BLANDOS -->
-      <div class="card info-card mb-4">
-        <div class="section-head">
-          <span class="section-num">5</span>
-          <h5 class="section-title mb-0">Tejidos Blandos</h5>
-          <span class="section-rule"></span>
+      <!-- PLAN DE TRATAMIENTO (base del presupuesto) -->
+      <div class="ficha-card mb-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <div class="d-flex align-items-center gap-2">
+            <h6 class="fw-bold mb-0">Plan de tratamiento</h6>
+            <span class="badge rounded-pill bg-primary-subtle text-primary">{{ monto(totalCaso) }}</span>
+            <small class="text-muted d-none d-md-inline" *ngIf="planes.length">
+              {{ pendientesCaso }} pendiente(s)
+            </small>
+          </div>
+          <div class="d-flex align-items-center gap-2" *ngIf="!soloLectura">
+            <button class="btn btn-success btn-sm rounded-3 px-3" (click)="generarPlanDesdeDiagnostico(false)"
+                    [disabled]="generandoPlan" title="Propone los tratamientos del catálogo que coinciden con el diagnóstico">
+              {{ planes.length ? 'Sugerir plan' : 'Generar plan' }}
+            </button>
+            <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" (click)="abrirGenerarPlan()"
+                    title="Elegir los tratamientos a mano">Elegir a mano</button>
+          </div>
         </div>
-        <div class="row g-3">
-          <div class="col-sm-6 col-md-4 col-lg-3" *ngFor="let t of tejidosBlandos">
-            <div>
-              <small class="info-label">{{ t.label }}</small>
-              <input type="text" class="form-control form-control-sm rounded-3" [(ngModel)]="t.valor" [ngModelOptions]="{standalone: true}" placeholder="Sin valoración">
+
+        <div *ngIf="planes.length === 0" class="alert alert-warning rounded-3 small mb-0 py-2">
+          Sin plan de tratamiento. Genérelo desde el diagnóstico o elija los tratamientos;
+          sin tratamientos con precio el presupuesto saldría en <strong>S/ 0.00</strong>.
+        </div>
+
+        <div *ngFor="let plan of planes" class="border rounded-3 mb-2" [class.opacidad-inactiva]="plan.estado === 'CANCELADO'">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-2 bg-light rounded-top-3">
+            <div class="d-flex align-items-center gap-2">
+              <button class="btn btn-sm btn-link p-0 text-decoration-none" (click)="alternarPlan(plan.id)">
+                <span *ngIf="planAbierto === plan.id">▾</span><span *ngIf="planAbierto !== plan.id">▸</span>
+              </button>
+              <div>
+                <span class="fw-semibold">{{ plan.nombre }}</span>
+                <span class="badge rounded-pill bg-secondary-subtle text-secondary ms-2">{{ plan.estado }}</span>
+                <small class="text-muted ms-2" *ngIf="plan.sesionesEstimadas">{{ plan.sesionesEstimadas }} sesion(es)</small>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-semibold small">{{ monto(totalPlan(plan.id)) }}</span>
+              <button *ngIf="!soloLectura" class="btn btn-sm btn-link p-0 text-decoration-none"
+                      (click)="abrirGenerarPlan()" title="Agregar tratamientos a este plan">+ agregar</button>
+            </div>
+          </div>
+
+          <div *ngIf="planAbierto === plan.id" class="px-3 py-2">
+            <p *ngIf="detalles(plan.id).length === 0" class="text-muted small mb-0 py-2">
+              Este plan aun no tiene tratamientos. Agregue al menos uno con precio para poder generar el presupuesto.
+            </p>
+
+            <!-- Pendientes: al quedar el saldo en 0 esta lista queda vacia -->
+            <p *ngIf="planVacio(plan) && detalles(plan.id).length > 0"
+               class="alert alert-success rounded-3 small mb-2 py-2">
+              Plan completado: no quedan tratamientos pendientes.
+            </p>
+            <div class="table-responsive" *ngIf="pendientes(plan.id).length > 0">
+              <table class="table table-sm align-middle mb-0">
+                <thead>
+                  <tr class="small text-muted">
+                    <th>Tratamiento</th>
+                    <th style="width: 90px;">Diente</th>
+                    <th style="width: 120px;">Precio (S/)</th>
+                    <th style="width: 70px;" *ngIf="!soloLectura"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let d of pendientes(plan.id)">
+                    <td class="small">
+                      {{ d.orden }}. {{ d.procedimiento }}
+                      <span class="badge rounded-pill bg-light text-secondary ms-1">{{ d.estado }}</span>
+                    </td>
+                    <td class="small text-muted">
+                      <span *ngIf="d.diente">{{ d.diente }}</span><span *ngIf="!d.diente">—</span>
+                      <span *ngIf="d.cara" class="ms-1">({{ d.cara }})</span>
+                    </td>
+                    <td>
+                      <input type="number" min="0" step="0.01" class="form-control form-control-sm rounded-3"
+                             [(ngModel)]="d.precio" [ngModelOptions]="{standalone: true}"
+                             [disabled]="soloLectura">
+                    </td>
+                    <td class="text-end" *ngIf="!soloLectura">
+                      <button class="btn btn-sm btn-outline-success border-0" title="Guardar precio"
+                              (click)="guardarPrecioDetalle(plan.id, d)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger border-0" title="Quitar del plan"
+                              (click)="eliminarDetalle(plan.id, d)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Realizados: quedan como historial clinico, aparte de los pendientes -->
+            <div *ngIf="realizados(plan.id).length > 0" class="mt-2">
+              <button class="btn btn-sm btn-link p-0 text-decoration-none" (click)="alternarRealizados(plan.id)">
+                {{ verRealizados[plan.id] ? '▾' : '▸' }}
+                {{ realizados(plan.id).length }} tratamiento(s) ya realizado(s)
+              </button>
+              <div class="table-responsive" *ngIf="verRealizados[plan.id]">
+                <table class="table table-sm align-middle mb-0 opacity-75">
+                  <tbody>
+                    <tr *ngFor="let d of realizados(plan.id)">
+                      <td class="small text-muted">
+                        {{ d.orden }}. {{ d.procedimiento }}
+                        <span class="badge rounded-pill bg-success-subtle text-success ms-1">REALIZADO</span>
+                      </td>
+                      <td class="small text-muted text-end" style="width: 120px;">{{ monto(d.precio) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-        <p class="small text-muted mt-2 mb-0">* Los tejidos blandos se registran en pantalla (sin guardado en base de datos).</p>
       </div>
 
       <!-- ACCIONES FINALES (cierre de la ficha) -->
@@ -171,7 +278,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M6.5 6a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5zM9.5 6a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 1 .5-.5z"/><path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zM4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/></svg>
           Firmar
         </button>
-        <button class="btn btn-success rounded-3 px-4" (click)="generarPresupuesto()">
+        <button class="btn btn-success rounded-3 px-4" (click)="pedirGenerarPresupuesto()">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm10.5 6.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM2.5 4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 2 4h.5z"/></svg>
           Generar presupuesto
         </button>
@@ -195,7 +302,7 @@
 
 </div>
 
-<!-- MODAL EDICIÓN -->
+<!-- MODAL EDICIó2N -->
 <div class="modal fade" [class.show]="showEditModal" [style.display]="showEditModal ? 'block' : 'none'" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content border-0 shadow rounded-4">
@@ -317,7 +424,7 @@
       <div class="modal-body">
         <div *ngIf="!pago.id" class="alert alert-warning rounded-3 small mb-3">
           Este caso aún no tiene presupuesto. Genérelo a partir del plan de tratamiento (diagnósticos y tratamientos asignados).
-          <button class="btn btn-sm btn-primary rounded-3 px-3 mt-2" (click)="generarPresupuesto()">Generar presupuesto</button>
+          <button class="btn btn-sm btn-primary rounded-3 px-3 mt-2" (click)="pedirGenerarPresupuesto()">Generar presupuesto</button>
         </div>
         <div *ngIf="pago.id" class="text-end mb-2">
           <span class="badge rounded-pill" [ngClass]="{
@@ -325,34 +432,96 @@
             'text-bg-primary': pago.estado === 'APROBADO',
             'text-bg-warning': pago.estado === 'PENDIENTE',
             'text-bg-danger': pago.estado === 'RECHAZADO'
-          }">{{ pago.estado }}</span>
+          }">{{ pago.estado === 'PAGADO' ? 'CANCELADO' : pago.estado }}</span>
+        </div>
+        <div *ngIf="pago.id && (pago.descuento > 0 || pago.montoPersonalizado != null)" class="border rounded-3 p-2 px-3 mb-2 small">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Subtotal (suma del plan)</span><span>{{ monto(pago.subtotal) }}</span>
+          </div>
+          <div class="d-flex justify-content-between" *ngIf="pago.descuento > 0">
+            <span class="text-muted">Descuento</span><span class="text-danger">- {{ monto(pago.descuento) }}</span>
+          </div>
+          <div class="d-flex justify-content-between" *ngIf="pago.montoPersonalizado != null">
+            <span class="text-muted">Monto editado por el odontologo</span><span>{{ monto(pago.montoPersonalizado) }}</span>
+          </div>
+          <button *ngIf="!soloLectura && pago.estado !== 'PAGADO'" class="btn btn-link btn-sm p-0 text-decoration-none"
+                  (click)="volverAlTotalCalculado()">volver al total del plan</button>
+        </div>
+        <div *ngIf="pago.id && pago.total === 0" class="alert alert-warning rounded-3 small mb-3">
+          Este presupuesto esta en <strong>S/ 0.00</strong>: el caso no tiene tratamientos con precio
+          asignado en su plan de tratamiento. Agregue o edite los tratamientos del plan y vuelva a generarlo.
         </div>
         <div class="row g-3">
           <div class="col-sm-4">
             <div class="pago-box pago-total">
-              <small class="pago-label">Total</small>
-              <p class="pago-valor">{{ pago.total != null ? 'S/ ' + pago.total : '—' }}</p>
+              <small class="pago-label">Total <span class="badge rounded-pill bg-warning text-dark ms-1"
+                    *ngIf="cambioPendiente">sin guardar</span></small>
+              <p class="pago-valor">{{ monto(totalVigente) }}</p>
             </div>
           </div>
           <div class="col-sm-4">
             <div class="pago-box pago-adelanto">
               <small class="pago-label">Abonado</small>
-              <p class="pago-valor">{{ pago.adelanto != null ? 'S/ ' + pago.adelanto : '—' }}</p>
+              <p class="pago-valor">{{ monto(pago.adelanto) }}</p>
             </div>
           </div>
           <div class="col-sm-4">
             <div class="pago-box pago-restante">
               <small class="pago-label">Saldo</small>
-              <p class="pago-valor">{{ pago.restante != null ? 'S/ ' + pago.restante : '—' }}</p>
+              <p class="pago-valor">{{ monto(saldoVigente) }}</p>
             </div>
           </div>
         </div>
         <div class="mb-3 mt-3" *ngIf="pago.id && pago.estado !== 'PAGADO'">
-          <label class="form-label fw-semibold text-muted small">Monto a pagar (S/)</label>
-          <input type="number" class="form-control rounded-3" [(ngModel)]="montoPago" [ngModelOptions]="{standalone: true}" placeholder="0.00">
+          <label class="form-label fw-semibold text-muted small">Monto a pagar ahora (S/)</label>
+          <div class="input-group">
+            <input type="number" class="form-control rounded-3" [(ngModel)]="montoPago" [ngModelOptions]="{standalone: true}" placeholder="0.00">
+            <button class="btn btn-outline-success rounded-3" type="button" (click)="pagarSaldoCompleto()"
+                    [disabled]="saldoVigente <= 0">Pagar todo el saldo ({{ monto(saldoVigente) }})</button>
+          </div>
+        </div>
+        <div class="border rounded-3 p-3" *ngIf="pago.id && pago.estado !== 'PAGADO' && !soloLectura">
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
+            <label class="form-label fw-semibold text-muted small mb-0">Descuento (S/)</label>
+            <div class="d-flex gap-1">
+              <button class="btn btn-sm btn-outline-secondary rounded-3 py-0" type="button"
+                      (click)="aplicarDescuentoRapido(0.10)">10%</button>
+              <button class="btn btn-sm btn-outline-secondary rounded-3 py-0" type="button"
+                      (click)="aplicarDescuentoRapido(0.20)">20%</button>
+              <button class="btn btn-sm btn-link text-decoration-none py-0" type="button"
+                      (click)="descuentoPago = 0; alCambiarDescuento()">Quitar</button>
+            </div>
+          </div>
+          <div class="row g-2 align-items-end">
+            <div class="col-6 col-md-3">
+              <label class="form-label text-muted small mb-1">Subtotal del plan</label>
+              <div class="form-control bg-light rounded-3 small">{{ monto(pago.subtotal) }}</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label text-muted small mb-1">Descuento</label>
+              <input type="number" min="0" step="0.01" class="form-control form-control-sm rounded-3"
+                     [(ngModel)]="descuentoPago" [ngModelOptions]="{standalone: true}"
+                     (ngModelChange)="alCambiarDescuento()" placeholder="0.00">
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label text-muted small mb-1">Total a cobrar</label>
+              <input type="number" min="0" step="0.01" class="form-control form-control-sm rounded-3 fw-semibold"
+                     [(ngModel)]="montoEditable" [ngModelOptions]="{standalone: true}"
+                     (ngModelChange)="alCambiarTotal()">
+            </div>
+            <div class="col-6 col-md-3">
+              <button class="btn btn-success btn-sm rounded-3 w-100" (click)="guardarDescuentoPresupuesto()"
+                      [disabled]="!descuentoPago">Aplicar</button>
+            </div>
+          </div>
+          <small class="text-muted d-block mt-2">
+            El total y el saldo de arriba cambian solo al escribir el descuento. Pulse <strong>Aplicar</strong>
+            para guardarlo; los precios del plan no se tocan.
+          </small>
         </div>
         <div *ngIf="pago.estado === 'PAGADO'" class="alert alert-success rounded-3 small mb-0">
-          Este presupuesto está totalmente pagado.
+          Este presupuesto esta cancelado: el saldo llego a S/ 0.00 y el plan de tratamiento quedo sin
+          tratamientos pendientes.
         </div>
       </div>
       <div class="modal-footer border-0 pt-0">
@@ -363,3 +532,108 @@
   </div>
 </div>
 <div class="modal-backdrop fade" [class.show]="showPago" *ngIf="showPago"></div>
+
+<!-- MODAL GENERAR PRESUPUESTO (CON DESCUENTO) -->
+<div class="modal fade" [class.show]="showGenerarPresupuesto" [style.display]="showGenerarPresupuesto ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Generar presupuesto</h5>
+        <button type="button" class="btn-close" (click)="showGenerarPresupuesto = false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex justify-content-between small border-bottom py-2">
+          <span class="text-muted">Subtotal (suma del plan de tratamiento)</span>
+          <span class="fw-medium">{{ monto(totalCaso) }}</span>
+        </div>
+        <div class="mt-3">
+          <label class="form-label fw-semibold text-muted small">Descuento a aplicar (S/)</label>
+          <div class="input-group">
+            <input type="number" min="0" step="0.01" class="form-control rounded-3" [(ngModel)]="descuentoPresupuesto"
+                   [ngModelOptions]="{standalone: true}" (ngModelChange)="alCambiarDescuentoGeneracion()" placeholder="0.00">
+            <button class="btn btn-outline-secondary rounded-3" type="button" (click)="descuentoPresupuesto = 0; alCambiarDescuentoGeneracion()">Quitar</button>
+          </div>
+          <small class="text-muted">No puede ser mayor al subtotal ({{ monto(totalCaso) }}).</small>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+          <span class="fw-semibold">Total a cobrar</span>
+          <span class="fs-5 fw-bold text-primary">{{ monto(totalConDescuento) }}</span>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-outline-secondary rounded-3" (click)="showGenerarPresupuesto = false">Cancelar</button>
+        <button class="btn btn-success rounded-3 fw-semibold px-4" (click)="confirmarGenerarPresupuesto()">
+          Generar presupuesto
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showGenerarPresupuesto" *ngIf="showGenerarPresupuesto"></div>
+
+<!-- MODAL GENERAR PLAN DESDE EL DIAGNOSTICO -->
+<div class="modal fade" [class.show]="showGenerarModal" [style.display]="showGenerarModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold">Generar plan desde el diagnóstico</h5>
+        <button type="button" class="btn-close" (click)="showGenerarModal = false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3 mb-3">
+          <div class="col-md-8">
+            <label class="form-label fw-semibold text-muted small">Nombre del plan</label>
+            <input type="text" class="form-control rounded-3" [(ngModel)]="nombrePlanAutogenerado">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold text-muted small">Sesiones estimadas</label>
+            <input type="number" min="1" class="form-control rounded-3" [(ngModel)]="sesionesPlan">
+          </div>
+        </div>
+
+        <input type="text" class="form-control rounded-3 mb-2" [(ngModel)]="busquedaTratamiento"
+               placeholder="Buscar tratamiento del catálogo...">
+
+        <div class="border rounded-3" style="max-height: 320px; overflow-y: auto;">
+          <div *ngFor="let t of catalogoFiltrado"
+               class="d-flex align-items-center justify-content-between gap-2 px-3 py-2 border-bottom cursor-pointer"
+               [class.bg-light]="cantidad(t.id!) > 0" (click)="alternarTratamiento(t)">
+            <div>
+              <span class="small fw-medium">{{ t.nombre }}</span>
+              <span class="badge rounded-pill bg-info-subtle text-info ms-2" *ngIf="t.categoria">{{ t.categoria }}</span>
+            </div>
+            <div class="d-flex align-items-center gap-2" (click)="$event.stopPropagation()">
+              <span class="small text-secondary">{{ monto(t.precioReferencia) }}</span>
+              <span *ngIf="cantidad(t.id!) > 0" class="badge rounded-pill bg-success text-white">{{ cantidad(t.id!) }}</span>
+              <input *ngIf="cantidad(t.id!) > 0" type="number" min="1" class="form-control form-control-sm rounded-3"
+                     style="width: 64px;" [(ngModel)]="seleccion[t.id!]" [ngModelOptions]="{standalone: true}">
+            </div>
+          </div>
+          <p *ngIf="catalogoFiltrado.length === 0" class="text-center text-secondary small py-4 mb-0">
+            No hay tratamientos que coincidan
+          </p>
+        </div>
+
+        <div *ngIf="seleccionados.length > 0" class="mt-3">
+          <small class="text-muted d-block mb-1">Se agregarán al plan:</small>
+          <div *ngFor="let s of seleccionados" class="d-flex justify-content-between small border-bottom py-1">
+            <span>{{ s.cantidad }} × {{ s.tratamiento.nombre }}</span>
+            <span class="fw-medium">{{ monto((s.tratamiento.precioReferencia || 0) * s.cantidad) }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0 d-flex justify-content-between align-items-center">
+        <span class="small text-secondary">Total a cotizar: <strong>{{ monto(totalSeleccion) }}</strong></span>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary rounded-3" (click)="showGenerarModal = false">Cancelar</button>
+          <button class="btn btn-success rounded-3 fw-semibold px-4" (click)="generarPlanAutomatico()"
+                  [disabled]="generandoPlan || seleccionados.length === 0">
+            Generar plan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showGenerarModal" *ngIf="showGenerarModal"></div>
+
