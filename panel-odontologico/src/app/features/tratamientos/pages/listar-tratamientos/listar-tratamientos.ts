@@ -19,6 +19,13 @@ export class ListarTratamientosComponent implements OnInit {
   Lista: Tratamiento[] = [];
   categorias: string[] = [];
 
+  /**
+   * Ids de los tratamientos propios del odontologo conectado. El ADMIN ve el
+   * catalogo de los dos, pero solo puede leer: los registros que no estan en
+   * este conjunto se muestran sin acciones.
+   */
+  propios: Set<number> | null = null;
+
   termino = '';
   filtroCategoria = '';
   incluirInactivos = true;
@@ -40,6 +47,24 @@ export class ListarTratamientosComponent implements OnInit {
   ngOnInit(): void {
     this.cargar();
     this.cargarCategorias();
+    this.cargarPropios();
+  }
+
+  /**
+   * Solo el catalogo propio: permite saber que filas puede editar el usuario.
+   * Para el ADMIN esta lista vuelve vacia y todo el catalogo queda de lectura.
+   */
+  cargarPropios() {
+    if (this.soloLectura()) {
+      // El ADMIN ve el catalogo de los dos, pero no puede modificar ninguno.
+      this.propios = new Set();
+      return;
+    }
+    this.service.listarActivos().subscribe({
+      next: (data) => (this.propios = new Set(
+        (data || []).map(t => t.id!).filter((id): id is number => id !== undefined))),
+      error: () => (this.propios = new Set())
+    });
   }
 
   cargar() {
@@ -85,6 +110,15 @@ export class ListarTratamientosComponent implements OnInit {
     this.editandoId = null;
     this.form = { activo: true, duracionMinutos: 30 };
     this.showModal = true;
+  }
+
+  /**
+   * El ADMIN supervisa, pero no edita: el catalogo de cada odontologo es privado.
+   * Si un registro no tiene dueno (dato heredado), tampoco se ofrece editar.
+   */
+  puedeEditar(tratamiento: Tratamiento): boolean {
+    if (this.soloLectura() || this.propios === null) return false;
+    return tratamiento.id !== undefined && this.propios.has(tratamiento.id);
   }
 
   abrirEdicion(tratamiento: Tratamiento) {
@@ -148,6 +182,7 @@ export class ListarTratamientosComponent implements OnInit {
         this.cerrarModal();
         this.cargar();
         this.cargarCategorias();
+        this.cargarPropios();
       },
       error: (err) => {
         this.guardando = false;
@@ -207,6 +242,7 @@ export class ListarTratamientosComponent implements OnInit {
           Swal.fire('Eliminado', 'El tratamiento se elimino de la base de datos.', 'success');
           this.cargar();
           this.cargarCategorias();
+          this.cargarPropios();
         },
         error: (err) => {
           console.error(err);

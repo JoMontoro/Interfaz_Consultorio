@@ -152,26 +152,26 @@
           <div class="d-flex align-items-center gap-2">
             <h6 class="fw-bold mb-0">Plan de tratamiento</h6>
             <span class="badge rounded-pill bg-primary-subtle text-primary">{{ monto(totalCaso) }}</span>
-            <small class="text-muted d-none d-md-inline" *ngIf="planes.length">
+            <small class="text-muted d-none d-md-inline" *ngIf="planesActivos.length">
               {{ pendientesCaso }} pendiente(s)
             </small>
           </div>
           <div class="d-flex align-items-center gap-2" *ngIf="!soloLectura">
             <button class="btn btn-success btn-sm rounded-3 px-3" (click)="generarPlanDesdeDiagnostico(false)"
                     [disabled]="generandoPlan" title="Propone los tratamientos del catálogo que coinciden con el diagnóstico">
-              {{ planes.length ? 'Sugerir plan' : 'Generar plan' }}
+              {{ planesActivos.length ? 'Sugerir plan' : 'Generar plan' }}
             </button>
             <button class="btn btn-outline-secondary btn-sm rounded-3 px-3" (click)="abrirGenerarPlan()"
                     title="Elegir los tratamientos a mano">Elegir a mano</button>
           </div>
         </div>
 
-        <div *ngIf="planes.length === 0" class="alert alert-warning rounded-3 small mb-0 py-2">
-          Sin plan de tratamiento. Genérelo desde el diagnóstico o elija los tratamientos;
+        <div *ngIf="planesActivos.length === 0" class="alert alert-warning rounded-3 small mb-0 py-2">
+          Sin plan de tratamiento vigente. Genérelo desde el diagnóstico o elija los tratamientos;
           sin tratamientos con precio el presupuesto saldría en <strong>S/ 0.00</strong>.
         </div>
 
-        <div *ngFor="let plan of planes" class="border rounded-3 mb-2" [class.opacidad-inactiva]="plan.estado === 'CANCELADO'">
+        <div *ngFor="let plan of planesActivos" class="border rounded-3 mb-2" [class.opacidad-inactiva]="plan.estado === 'CANCELADO'">
           <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-2 bg-light rounded-top-3">
             <div class="d-flex align-items-center gap-2">
               <button class="btn btn-sm btn-link p-0 text-decoration-none" (click)="alternarPlan(plan.id)">
@@ -258,6 +258,46 @@
                     </tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORIAL: planes ya cancelados (pagados) del paciente -->
+        <div *ngIf="planesHistorial.length > 0" class="mt-2">
+          <button class="btn btn-sm btn-link p-0 text-decoration-none" (click)="mostrarHistorial = !mostrarHistorial">
+            {{ mostrarHistorial ? '▾' : '▸' }}
+            {{ planesHistorial.length }} plan(es) ya cancelado(s) y registrado(s) en el historial del paciente
+          </button>
+          <div class="mt-2" *ngIf="mostrarHistorial">
+            <div *ngFor="let plan of planesHistorial" class="border rounded-3 mb-2">
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-2 bg-light rounded-top-3">
+                <div class="d-flex align-items-center gap-2">
+                  <div>
+                    <span class="fw-semibold">{{ plan.nombre }}</span>
+                    <span class="badge rounded-pill bg-success-subtle text-success ms-2">PAGADO</span>
+                    <small class="text-muted ms-2" *ngIf="plan.sesionesEstimadas">{{ plan.sesionesEstimadas }} sesion(es)</small>
+                  </div>
+                </div>
+                <span class="fw-semibold small">{{ monto(totalPlan(plan.id)) }}</span>
+              </div>
+              <div class="px-3 py-2">
+                <p *ngIf="realizados(plan.id).length === 0" class="text-muted small mb-0 py-2">
+                  Plan sin tratamientos realizados registrados.
+                </p>
+                <div class="table-responsive" *ngIf="realizados(plan.id).length > 0">
+                  <table class="table table-sm align-middle mb-0 opacity-75">
+                    <tbody>
+                      <tr *ngFor="let d of realizados(plan.id)">
+                        <td class="small text-muted">
+                          {{ d.orden }}. {{ d.procedimiento }}
+                          <span class="badge rounded-pill bg-success-subtle text-success ms-1">REALIZADO</span>
+                        </td>
+                        <td class="small text-muted text-end" style="width: 120px;">{{ monto(d.precio) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
@@ -359,24 +399,47 @@
 
 <!-- MODAL CONSENTIMIENTO INFORMADO -->
 <div class="modal fade" [class.show]="showConsentimiento" [style.display]="showConsentimiento ? 'block' : 'none'" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow rounded-4">
       <div class="modal-header border-0 pb-0">
         <h5 class="fw-bold">Consentimiento Informado</h5>
         <button type="button" class="btn-close" (click)="cerrarConsentimiento()"></button>
       </div>
       <div class="modal-body">
-        <div class="consent-box">
-          <p class="mb-0">{{ consentimientoTexto }}</p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-muted small">Tipo de procedimiento</label>
+            <select class="form-select form-select-sm rounded-3" [(ngModel)]="tipoProcedimientoSeleccionado" [ngModelOptions]="{standalone: true}">
+              <option *ngFor="let t of tiposProcedimiento" [value]="t">{{ etiquetasProcedimiento[t] }}</option>
+            </select>
+          </div>
+          <div class="col-md-6 d-flex align-items-end">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="checkConsent" [(ngModel)]="consentimientoAceptado" [ngModelOptions]="{standalone: true}">
+              <label class="form-check-label small" for="checkConsent">He leído y acepto el consentimiento informado</label>
+            </div>
+          </div>
         </div>
-        <div class="form-check mt-3">
-          <input class="form-check-input" type="checkbox" id="checkConsent" [(ngModel)]="consentimientoAceptado" [ngModelOptions]="{standalone: true}">
-          <label class="form-check-label small" for="checkConsent">He leído y acepto el consentimiento informado</label>
+
+        <div class="consent-box mt-3">
+          <p class="mb-0 small">{{ consentimientoTexto }}</p>
+        </div>
+
+        <div class="alert alert-info rounded-3 small mt-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.765-1.007l1.606-3.91c-.543-1.046-1.942-1.746-2.846-1.991l1.03-1.732c.278-.47.524-.816.281-1.148-.243-.332-.68-.39-.984-.246-.304.14-.673.372-.965.606l-1.57-1.251C8.357 4.256 9 3.738 9 3c0-.694-.536-1.3-.1.326zM8 1.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
+          <strong>Requisito legal:</strong> Para aceptar el consentimiento es obligatorio capturar la firma del paciente usando el botón <strong>"Firmar"</strong> de la ficha clínica.
+        </div>
+
+        <div class="alert alert-success rounded-3 small mt-2" *ngIf="firmaPacienteBase64">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="me-1" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 8 8zm-3.97-3.03a.75.75 0 0 0-1.02.02L6.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>
+          <strong>Firma del paciente capturada</strong> ✓
         </div>
       </div>
       <div class="modal-footer border-0 pt-0">
         <button class="btn btn-outline-secondary rounded-3" (click)="cerrarConsentimiento()">Cancelar</button>
-        <button class="btn btn-primary rounded-3 px-4" (click)="aceptarConsentimiento()" [disabled]="!consentimientoAceptado">Aceptar</button>
+        <button class="btn btn-success rounded-3 px-4" (click)="aceptarConsentimiento()" [disabled]="!consentimientoAceptado || !firmaPacienteBase64">
+          {{ firmaPacienteBase64 ? 'Aceptar y guardar con firma' : 'Firma requerida' }}
+        </button>
       </div>
     </div>
   </div>

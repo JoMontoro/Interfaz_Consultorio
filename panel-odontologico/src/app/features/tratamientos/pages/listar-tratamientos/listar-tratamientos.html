@@ -5,7 +5,8 @@
     <div>
       <h4 class="fw-bold mb-1">Tratamientos</h4>
       <p class="text-secondary small mb-0">
-        Catalogo de tratamientos del consultorio, disponible para ambos odontologos al crear citas y planes.
+        Tu propio catalogo de tratamientos: solo tu lo ves y lo usas al crear citas y planes.
+        El otro odontologo no lo comparte ni lo modifica.
       </p>
     </div>
     <button *ngIf="!soloLectura()" class="btn btn-primary fw-semibold d-flex align-items-center gap-2"
@@ -18,7 +19,7 @@
   <!-- Aviso solo lectura -->
   <div class="alert alert-warning d-flex align-items-center gap-2 py-2 small rounded-3" *ngIf="soloLectura()">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-    <span>Tu rol es de supervision: puedes consultar el catalogo, pero no registrar ni modificar tratamientos.</span>
+    <span>Tu rol es de supervision: puedes consultar el catalogo de los dos odontologos, pero no registrar ni modificar tratamientos.</span>
   </div>
 
   <!-- Resumen -->
@@ -89,7 +90,7 @@
               <span class="badge rounded-pill bg-secondary-subtle text-secondary fw-medium" *ngIf="!t.activo">Inactivo</span>
             </td>
             <td class="pe-4 text-end">
-              <div class="d-flex gap-1 justify-content-end" *ngIf="!soloLectura()">
+              <div class="d-flex gap-1 justify-content-end" *ngIf="puedeEditar(t)">
                 <button class="btn btn-sm btn-outline-success border-0" (click)="abrirEdicion(t)" title="Editar">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                 </button>
@@ -102,7 +103,7 @@
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
               </div>
-              <span class="text-secondary small" *ngIf="soloLectura()">—</span>
+              <span class="text-secondary small" *ngIf="!puedeEditar(t)">—</span>
             </td>
           </tr>
           <tr *ngIf="tratamientosFiltrados.length === 0">

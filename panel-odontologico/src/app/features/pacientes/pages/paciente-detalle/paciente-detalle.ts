@@ -9,6 +9,7 @@ import { PresupuestoService } from '../../../../core/services/presupuesto';
 import { PlanTratamientoService } from '../../../../core/services/plan-tratamiento';
 import { AuthService } from '../../../../core/services/auth';
 import { Tratamiento, TratamientoService } from '../../../../core/services/tratamiento';
+import { ConsentimientoInformadoService, TipoProcedimiento, ETIQUETAS_PROCEDIMIENTO, ConsentimientoGuardarRequest } from '../../../../core/services/consentimiento-informado';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -39,7 +40,8 @@ export class DetallePaciente implements OnInit {
     private presupuestoService: PresupuestoService,
     private planService: PlanTratamientoService,
     private tratamientoService: TratamientoService,
-    private auth: AuthService
+    private auth: AuthService,
+    private consentimientoService: ConsentimientoInformadoService
   ) {}
 
   // Modales
@@ -53,6 +55,13 @@ export class DetallePaciente implements OnInit {
     'diagnóstico, el plan de tratamiento odontológico, sus beneficios, riesgos, ' +
     'alternativas y costos. Autorizo al profesional a realizar los procedimientos ' +
     'necesarios para mi atención y acepto las indicaciones post-tratamiento.';
+
+  tipoProcedimientoSeleccionado: TipoProcedimiento = TipoProcedimiento.GENERAL;
+  tiposProcedimiento = Object.values(TipoProcedimiento);
+  etiquetasProcedimiento = ETIQUETAS_PROCEDIMIENTO;
+
+  firmaPacienteBase64: string | null = null;
+  firmaOdontologoBase64: string | null = null;
 
   showFirmar = false;
   firmaCapturada = false;
@@ -379,13 +388,25 @@ export class DetallePaciente implements OnInit {
       next: (data) => {
         this.planes = data || [];
         this.planes.forEach(p => this.cargarDetalles(p.id));
-        if (this.planes.length && this.planAbierto === null) {
-          this.planAbierto = this.planes[0].id;
+        if (this.planAbierto === null || !this.planesActivos.some(p => p.id === this.planAbierto)) {
+          this.planAbierto = this.planesActivos.length ? this.planesActivos[0].id : null;
         }
       },
       error: () => (this.planes = [])
     });
   }
+
+  /** El plan panel muestra solo lo vigente: los planes pagados pasan al historial. */
+  get planesActivos(): any[] {
+    return this.planes.filter(p => p.estado !== 'COMPLETADO' && p.estado !== 'CANCELADO');
+  }
+
+  /** Planes ya cancelados (pagados): se conservan como registro clinico del paciente. */
+  get planesHistorial(): any[] {
+    return this.planes.filter(p => p.estado === 'COMPLETADO');
+  }
+
+  mostrarHistorial = false;
 
   cargarDetalles(planId: number) {
     this.planService.listarDetalles(planId).subscribe({
@@ -433,13 +454,12 @@ export class DetallePaciente implements OnInit {
 
   /** Total de todo lo cotizable del caso: es lo que vera el paciente. */
   get totalCaso(): number {
-    return this.planes.reduce((suma, p) => suma + (p.estado === 'CANCELADO' ? 0 : this.totalPlan(p.id)), 0);
+    return this.planesActivos.reduce((suma, p) => suma + this.totalPlan(p.id), 0);
   }
 
   /** Tratamientos que aun falta atender: al llegar a cero el plan queda liquidado. */
   get pendientesCaso(): number {
-    return this.planes
-      .filter(p => p.estado !== 'CANCELADO')
+    return this.planesActivos
       .reduce((suma, p) => suma + this.detalles(p.id).filter(d => d.estado === 'PENDIENTE').length, 0);
   }
 
@@ -502,8 +522,8 @@ export class DetallePaciente implements OnInit {
     }
     this.seleccion = {};
     this.busquedaTratamiento = '';
-    this.nombrePlanAutogenerado = this.planes[0]?.nombre || 'Plan de tratamiento';
-    this.sesionesPlan = this.planes[0]?.sesionesEstimadas || 1;
+    this.nombrePlanAutogenerado = this.planesActivos[0]?.nombre || 'Plan de tratamiento';
+    this.sesionesPlan = this.planesActivos[0]?.sesionesEstimadas || 1;
     this.showGenerarModal = true;
     if (!this.catalogo.length) {
       this.tratamientoService.listarActivos().subscribe({
@@ -731,9 +751,55 @@ export class DetallePaciente implements OnInit {
   }
 
   aceptarConsentimiento() {
-    this.consentimientoAceptado = true;
-    this.showConsentimiento = false;
-    Swal.fire('Registrado', 'Consentimiento informado registrado', 'success');
+    const idPaciente = Number(this.route.snapshot.paramMap.get('id'));
+    const idHistorial = this.historial?.id;
+
+    if (!this.consentimientoAceptado) {
+      Swal.fire('Aviso', 'Debe aceptar el consentimiento informado', 'warning');
+      return;
+    }
+
+    if (!this.firmaPacienteBase64) {
+      Swal.fire('Firma requerida', 'Para aceptar el consentimiento es obligatorio capturar la firma del paciente. Use el botón "Firmar".', 'warning');
+      return;
+    }
+
+    const req: ConsentimientoGuardarRequest = {
+      idPaciente,
+      idHistorialClinico: idHistorial,
+      tipoProcedimiento: this.tipoProcedimientoSeleccionado,
+      titulo: 'Consentimiento informado - ' + this.etiquetasProcedimiento[this.tipoProcedimientoSeleccionado],
+      contenido: this.consentimientoTexto,
+      version: '1.0',
+      aceptado: true,
+      firmaPacienteBase64: this.firmaPacienteBase64,
+      firmaOdontologoBase64: this.firmaOdontologoBase64 || undefined,
+      ipAddress: '',
+      userAgent: navigator.userAgent
+    };
+
+    this.consentimientoService.guardar(req).subscribe({
+      next: () => {
+        this.showConsentimiento = false;
+        Swal.fire('Registrado', 'Consentimiento informado guardado con firma del paciente y PDF generado', 'success');
+      },
+      error: (err: any) => {
+        console.error('Error detalle:', err);
+        let msg = '';
+        if (err?.error?.mensaje) {
+          msg = err.error.mensaje;
+        } else if (err?.error?.message) {
+          msg = err.error.message;
+        } else if (typeof err?.error === 'string') {
+          msg = err.error;
+        } else if (err?.message) {
+          msg = err.message;
+        } else {
+          msg = 'Error ' + (err?.status || 500) + ': ' + (err?.statusText || 'sin respuesta del servidor');
+        }
+        Swal.fire('Error', msg, 'error');
+      }
+    });
   }
 
   guardarMotivo() {
@@ -862,8 +928,11 @@ export class DetallePaciente implements OnInit {
       Swal.fire('Aviso', 'Capture la firma antes de continuar', 'warning');
       return;
     }
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return;
+    this.firmaPacienteBase64 = canvas.toDataURL('image/png');
     this.showFirmar = false;
-    Swal.fire('Registrado', 'Firma capturada correctamente', 'success');
+    Swal.fire('Firma capturada', 'La firma del paciente se registró correctamente', 'success');
   }
 
 }

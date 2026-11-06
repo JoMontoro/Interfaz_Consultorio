@@ -57,7 +57,9 @@ export class TratamientoService {
 
   /** Baja logica: deja de ofrecerse pero conserva el historial clinico. */
   cambiarEstado(id: number, activo: boolean) {
-    return this.http.put<Tratamiento>(`${this.apiUrl}/${id}/estado`, { activo }, { headers: this.headers() });
+    return this.http.put<Tratamiento>(`${this.apiUrl}/${id}/estado`, { activo } as Tratamiento, {
+      headers: this.headers()
+    });
   }
 
   eliminar(id: number) {
